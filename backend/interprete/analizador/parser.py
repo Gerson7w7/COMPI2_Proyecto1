@@ -35,29 +35,21 @@ def instruccion(p):
     """
     p[0] = p[1];
 
-def declaracion1(p):
+def declaracion(p):
     """
     declaracion : LET MUT IDENTIFICADOR DOS_PUNTOS type igualacion PUNTO_COMA
+        | LET MUT IDENTIFICADOR igualacion PUNTO_COMA
+        | LET IDENTIFICADOR DOS_PUNTOS type igualacion PUNTO_COMA
+        | LET IDENTIFICADOR igualacion PUNTO_COMA
     """
-    p[0] = Declaracion(p[5], p[6], p.lineno(1), p.lexpos(1));
-
-def declaracion2(p):
-    """
-    declaracion : LET MUT IDENTIFICADOR igualacion PUNTO_COMA
-    """
-    p[0] = Declaracion(None, p[4], p.lineno(1), p.lexpos(1));
-
-def declaracion3(p):
-    """
-    declaracion : LET IDENTIFICADOR DOS_PUNTOS type igualacion PUNTO_COMA
-    """
-    p[0] = Declaracion(p[4], p[5], p.lineno(1), p.lexpos(1));
-
-def declaracion4(p):
-    """
-    declaracion : LET IDENTIFICADOR igualacion PUNTO_COMA
-    """
-    p[0] = Declaracion(None, p[3], p.lineno(1), p.lexpos(1));
+    if (len(p) == 8):
+        p[0] = Declaracion(p[5], p[6], p.lineno(1), p.lexpos(1));
+    elif (len(p) == 6):
+        p[0] = Declaracion(None, p[4], p.lineno(1), p.lexpos(1));
+    elif (len(p) == 7):
+        p[0] = Declaracion(p[4], p[5], p.lineno(1), p.lexpos(1));
+    elif (len(p) == 4):
+        p[0] = Declaracion(None, p[3], p.lineno(1), p.lexpos(1));
 
 def type(p):
     """
@@ -67,4 +59,19 @@ def type(p):
         | CHAR
         | STRING
         | AMPERSON STR
+    """
+    if (len(p) == 2):
+        p[0] = p[1];
+    elif (len(p) == 3):
+        p[0] = p[2];
+
+def igualacion(p):
+    """
+    igualacion : IGUALDAD expresion
+    """
+    p[0] = p[2];
+
+def expresion(p):
+    """
+    
     """
