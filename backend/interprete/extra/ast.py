@@ -1,11 +1,10 @@
+from .Console import Console
 
+# clase con la que se formará el ast final
 class Ast:
-    def __init__(self, instrucciones=None):
-        if instrucciones is None:
-            instrucciones = []
+    def __init__(self, instrucciones):
+        self.instrucciones: list = instrucciones;
 
-        self.instrucciones = instrucciones
-
-    def ejecutar(self, driver, ts):
+    def ejecutar(self, console: Console, scope: Scope):
         for instruccion in self.instrucciones:
-            instruccion.ejecutar(driver, ts)
+            instruccion.ejecutar(console, scope)
