@@ -8,7 +8,7 @@ tokens = lexer.tokens;
 precedence = (
     ('left', 'RESTA', 'SUMA'),
     ('left', 'MULTIPLICACION', 'DIVISION', 'MODULO'),
-    ('right', 'UNARIO'),
+    ('right', 'UMENOS'),
 )
 
 def inicio(p):
@@ -71,7 +71,33 @@ def igualacion(p):
     """
     p[0] = p[2];
 
+# unidad aritmética
 def expresion(p):
     """
-    
+    expresion : RESTA expresion %prec UMENOS
+        | I64 DOS_PUNTOS DOS_PUNTOS POTENCIA PARENTESIS_ABRE expresion COMA expresion PARENTESIS_CIERRA
+        | expresion SUMA expresion
+        | expresion RESTA expresion
+        | expresion MULTIPLICACION expresion
+        | expresion DIVISION expresion
+        | expresion MODULO expresion
     """
+    if (len(p) == 3):
+        # numero negativo
+        p[0] = Aritmetica(p[2], -1, TipoAritmetica.MULTIPLICACION, p.lineno(1), p.lexpos(1));
+    elif (len(p) == 10):
+        p[0] = Aritmetica(p[6], p[8], TipoAritmetica.POTENCIA, p.lineno(1), p.lexpos(1));
+    elif (p[2] == '+'):
+        p[0] = Aritmetica(p[1], p[3], TipoAritmetica.SUMA, p.lineno(1), p.lexpos(1));
+    elif (p[2] == '-'):
+        p[0] = Aritmetica(p[1], p[3], TipoAritmetica.RESTA, p.lineno(1), p.lexpos(1));
+    elif (p[2] == '*'):
+        p[0] = Aritmetica(p[1], p[3], TipoAritmetica.MULTIPLICACION, p.lineno(1), p.lexpos(1));
+    elif (p[2] == '/'):
+        p[0] = Aritmetica(p[1], p[3], TipoAritmetica.DIVISION, p.lineno(1), p.lexpos(1));
+    elif (p[2] == '%'):
+        p[0] = Aritmetica(p[1], p[3], TipoAritmetica.MODULO, p.lineno(1), p.lexpos(1));
+
+
+# construyendo el parser (analizador sintáctico)
+parser = yacc();

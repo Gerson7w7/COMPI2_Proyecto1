@@ -137,13 +137,17 @@ def t_IDENTIFICADOR(t):
 
 # contamos las líneas del código
 def t_nuevalinea(t):
-    r'\n+'
+    r'\n+';
     t.lexer.lineno += len(t.value)
 
 # manejo de errores léxicos
 def t_error(t):
     print(f'Caracter no reconocido {t.value[0]!r}. En la linea {t.lexer.lineno}')
     t.lexer.skip(1)
+
+def t_comentario(t):
+    r'//.*';
+    pass;
 
 # construímos el lexer (analizador léxico)
 lex.lex();
