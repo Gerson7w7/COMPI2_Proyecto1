@@ -2,6 +2,10 @@
 from ply.yacc import yacc
 from analizador import lexer
 
+from ..expresiones.Aritmetica import Aritmetica
+from ..extra.Tipos import TipoAritmetica
+from ..extra.Ast import Ast
+
 tokens = lexer.tokens;
 
 # precedencia de operadores
@@ -43,13 +47,13 @@ def declaracion(p):
         | LET IDENTIFICADOR igualacion PUNTO_COMA
     """
     if (len(p) == 8):
-        p[0] = Declaracion(p[5], p[6], p.lineno(1), p.lexpos(1));
+        p[0] = Declaracion(True, p[3], p[5], p[6], p.lineno(1), p.lexpos(1));
     elif (len(p) == 6):
-        p[0] = Declaracion(None, p[4], p.lineno(1), p.lexpos(1));
+        p[0] = Declaracion(True, p[3], None, p[4], p.lineno(1), p.lexpos(1));
     elif (len(p) == 7):
-        p[0] = Declaracion(p[4], p[5], p.lineno(1), p.lexpos(1));
+        p[0] = Declaracion(False, p[2], p[4], p[5], p.lineno(1), p.lexpos(1));
     elif (len(p) == 4):
-        p[0] = Declaracion(None, p[3], p.lineno(1), p.lexpos(1));
+        p[0] = Declaracion(False, p[2], None, p[3], p.lineno(1), p.lexpos(1));
 
 def type(p):
     """

@@ -7,3 +7,11 @@ class TipoDato(Enum):
     CHAR = 4
     STRING = 5
     STR = 6
+
+class TipoAritmetica(Enum):
+    SUMA = 1
+    RESTA = 2
+    MULTIPLICACION = 3
+    DIVISION = 4
+    POTENCIA = 5
+    MODULO = 6
