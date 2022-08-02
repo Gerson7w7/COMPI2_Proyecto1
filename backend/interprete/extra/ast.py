@@ -1,4 +1,5 @@
 from .Console import Console
+from .Scope import Scope
 
 # clase con la que se formará el ast final
 class Ast:

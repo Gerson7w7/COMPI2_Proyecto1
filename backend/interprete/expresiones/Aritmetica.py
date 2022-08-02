@@ -1,4 +1,4 @@
-from backend.interprete.extra.Retorno import RetornoExpresion
+from ..extra.Retorno import RetornoExpresion
 from ..extra.Tipos import TipoAritmetica, TipoDato
 from .Expresion import Expresion
 from ..extra.Console import Console

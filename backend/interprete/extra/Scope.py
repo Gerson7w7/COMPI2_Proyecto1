@@ -1,11 +1,11 @@
 # clase para manejar los entornos, ambitos, env o scopes
+import this
 from ..extra.TablaSimbolo import TablaSimbolo
 from .Tipos import TipoDato 
-from .Scope import Scope
 from .Simbolo import Simbolo
 
 class Scope:
-    def __init__(self, padre: Scope):
+    def __init__(self, padre: this):
         self.padre = padre;
         self.simbolos = [];
         self.variables = {};

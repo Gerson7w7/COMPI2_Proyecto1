@@ -31,7 +31,7 @@ class Declaracion(Instruccion):
             # obteniendo el valor de la expresion
             val = self.valor.ejecutar(console, scope);
             if (val.tipo == tipo):
-                scope.crearVariable()
+                scope.crearVariable(self.id, val.valor, val.tipo, self.linea, self.columna);
             else:
                 # error, diferentes tipos de datos
                 pass;

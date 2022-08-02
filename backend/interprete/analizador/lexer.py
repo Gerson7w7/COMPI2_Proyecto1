@@ -1,5 +1,5 @@
 # importamos la libería lex
-from ply import lex
+from ..ply import lex
 
 # definimos los tokens de nuestro lenguaje
 tokens = (

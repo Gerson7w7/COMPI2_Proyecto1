@@ -1,10 +1,11 @@
 # ejemplos: https://www.dabeaz.com/ply/ply.html#ply_nn33
-from ply.yacc import yacc
-from analizador import lexer
+from ..ply.yacc import yacc
+from ..analizador import lexer
 
 from ..expresiones.Aritmetica import Aritmetica
 from ..extra.Tipos import TipoAritmetica
 from ..extra.Ast import Ast
+from ..instrucciones.Declaracion import Declaracion
 
 tokens = lexer.tokens;
 
@@ -15,14 +16,14 @@ precedence = (
     ('right', 'UMENOS'),
 )
 
-def inicio(p):
+def p_inicio(p):
     """
     inicio : instrucciones
     """
     p[0] = Ast(p[1]);
 
 # lista de instrucciones
-def instrucciones(p):
+def p_instrucciones(p):
     """
     instrucciones : instrucciones instruccion
         | instruccion
@@ -33,13 +34,13 @@ def instrucciones(p):
         p[0] = [p[1]];     
 
 # declaracion de variables
-def instruccion(p):
+def p_instruccion(p):
     """
     instruccion : declaracion PUNTO_COMA
     """
     p[0] = p[1];
 
-def declaracion(p):
+def p_declaracion(p):
     """
     declaracion : LET MUT IDENTIFICADOR DOS_PUNTOS type igualacion PUNTO_COMA
         | LET MUT IDENTIFICADOR igualacion PUNTO_COMA
@@ -55,7 +56,7 @@ def declaracion(p):
     elif (len(p) == 4):
         p[0] = Declaracion(False, p[2], None, p[3], p.lineno(1), p.lexpos(1));
 
-def type(p):
+def p_type(p):
     """
     type : I64
         | F64
@@ -69,14 +70,14 @@ def type(p):
     elif (len(p) == 3):
         p[0] = p[2];
 
-def igualacion(p):
+def p_igualacion(p):
     """
     igualacion : IGUALDAD expresion
     """
     p[0] = p[2];
 
 # unidad aritmética
-def expresion(p):
+def p_expresion(p):
     """
     expresion : RESTA expresion %prec UMENOS
         | I64 DOS_PUNTOS DOS_PUNTOS POTENCIA PARENTESIS_ABRE expresion COMA expresion PARENTESIS_CIERRA
@@ -104,4 +105,4 @@ def expresion(p):
 
 
 # construyendo el parser (analizador sintáctico)
-parser = yacc();
+parser = yacc()
