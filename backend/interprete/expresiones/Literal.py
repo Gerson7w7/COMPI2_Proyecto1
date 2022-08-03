@@ -5,13 +5,14 @@ from ..extra.Scope import Scope
 from ..extra.Retorno import RetornoExpresion
 
 class Literal(Expresion):
-    def __init__(self, linea: int, columna: int, valor, tipo: TipoDato):
+    def __init__(self, valor, tipo: TipoDato, linea: int, columna: int):
         super().__init__(linea, columna)
         self.valor = valor;
         self.tipo = tipo;
     
     def ejecutar(self, console: Console, scope: Scope):
         if (self.tipo == TipoDato.INT64):
+            print("INTTTT : " + int(self.valor))
             return RetornoExpresion(int(self.valor), TipoDato.INT64);
         elif (self.tipo == TipoDato.FLOAT64):
             return RetornoExpresion(float(self.valor), TipoDato.FLOAT64);

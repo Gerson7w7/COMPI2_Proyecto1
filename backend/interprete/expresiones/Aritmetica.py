@@ -23,6 +23,7 @@ class Aritmetica(Expresion):
             if (self.tipo == TipoAritmetica.SUMA):  
                 if (valIzquierda.tipo == TipoDato.INT64 or valIzquierda.tipo == TipoDato.FLOAT64 or valIzquierda.tipo == TipoDato.STRING):
                     # se hace la operacion correspondiente y se pasa el tipo
+                    print("summaaa : " + (valIzquierda.valor + valDerecha.valor))
                     return RetornoExpresion((valIzquierda.valor + valDerecha.valor), valIzquierda.tipo);
                 # error no se puede operar izq con der
             elif (self.tipo == TipoAritmetica.RESTA):
