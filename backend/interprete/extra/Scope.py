@@ -5,14 +5,14 @@ from .Tipos import TipoDato
 from .Simbolo import Simbolo
 
 class Scope:
-    def __init__(self, padre: this):
+    def __init__(self, padre):
         self.padre = padre;
         self.simbolos = [];
         self.variables = {};
         self.funciones = {};
     
     # función para crear una variable
-    def crearVariable(self, id: str, valor, tipo: TipoDato, linea: int, columna: int):
+    def crearVariable(self, id: str, valor, tipo: TipoDato, mut:bool, linea: int, columna: int):
         scope: Scope = self;
 
         while(scope != None):
@@ -22,9 +22,9 @@ class Scope:
                 # ERROR: la variable ya ha sido declarada
             scope = scope.padre;
         # procedemos a crear la variable
-        self.variables[id] = Simbolo(valor, id, tipo);
+        self.variables[id] = Simbolo(valor, id, tipo, mut);
         # lo guardamos en la tabla de simbolos
-        self.simbolos.append(TablaSimbolo(id, 'variable', TipoDato[tipo], '', linea, columna))
+        self.simbolos.append(TablaSimbolo(id, 'variable', str(tipo), '', linea, columna))
 
     # función para obtener el valor de una variable
     def getValor(self, id:str, linea:int, columna:int):

@@ -8,6 +8,7 @@ from ..extra.Tipos import TipoAritmetica, TipoDato
 from ..extra.Ast import Ast
 from ..instrucciones.Declaracion import Declaracion
 from ..expresiones.Literal import Literal
+from interprete.instrucciones.Imprimir import Imprimir
 
 tokens = lexer.tokens;
 
@@ -31,14 +32,15 @@ def p_instrucciones(p):
         | instruccion
     """
     if (len(p) == 3):
-        p[0] = p[1].append(p[2]);
-    elif (len(p) == 2):
+        p[1].append(p[2]); p[0] = p[1];
+    else:
         p[0] = [p[1]];     
 
 # declaracion de variables
 def p_instruccion(p):
     """
     instruccion : declaracion PUNTO_COMA
+        | imprimir PUNTO_COMA
     """
     p[0] = p[1];
 
@@ -49,13 +51,13 @@ def p_declaracion(p):
         | LET IDENTIFICADOR DOS_PUNTOS type igualacion
         | LET IDENTIFICADOR igualacion
     """
-    if (len(p) == 8):
+    if (len(p) == 7):
         p[0] = Declaracion(True, p[3], p[5], p[6], p.lineno(1), p.lexpos(1));
-    elif (len(p) == 6):
+    elif (len(p) == 5):
         p[0] = Declaracion(True, p[3], None, p[4], p.lineno(1), p.lexpos(1));
-    elif (len(p) == 7):
+    elif (len(p) == 6):
         p[0] = Declaracion(False, p[2], p[4], p[5], p.lineno(1), p.lexpos(1));
-    elif (len(p) == 4):
+    else:
         p[0] = Declaracion(False, p[2], None, p[3], p.lineno(1), p.lexpos(1));
 
 def p_type(p):
@@ -69,7 +71,7 @@ def p_type(p):
     """
     if (len(p) == 2):
         p[0] = p[1];
-    elif (len(p) == 3):
+    else:
         p[0] = p[2];
 
 def p_igualacion(p):
@@ -96,27 +98,21 @@ def p_expresion(p):
         | expresion MODULO expresion
     """
     if (len(p) == 2): 
-        print("val: " + str(p[1]) + " type: " + type(p[1]))
         # terminales
-        if (type(p[1] == int)):
-            print("soi dfafd")
+        if (type(p[1]) == int):
             # enteros
             p[0] = Literal(p[1], TipoDato.INT64, p.lineno(1), p.lexpos(1));
-        elif (type(p[1] == float)):
+        elif (type(p[1]) == float):
             # decimales
-            print("soi decimal")
             p[0] = Literal(p[1], TipoDato.FLOAT64, p.lineno(1), p.lexpos(1));
         elif (p[1] == 'true' or p[1] == 'false'):
             # bools
-            print("soi bool")
             p[0] = Literal(p[1], TipoDato.BOOLEAN, p.lineno(1), p.lexpos(1));
         elif (re.fullmatch(r'.', p[1])):
             # chars
-            print("soi char")
             p[0] = Literal(p[1], TipoDato.CHAR, p.lineno(1), p.lexpos(1));
         else:
             # strings
-            print("soi str")
             p[0] = Literal(p[1], TipoDato.STRING, p.lineno(1), p.lexpos(1));
     elif (len(p) == 3):
         # numero negativo
@@ -124,6 +120,7 @@ def p_expresion(p):
     elif (len(p) == 10):
         p[0] = Aritmetica(p[6], p[8], TipoAritmetica.POTENCIA, p.lineno(1), p.lexpos(1));
     elif (p[2] == '+'):
+        print("sssuuuum")
         p[0] = Aritmetica(p[1], p[3], TipoAritmetica.SUMA, p.lineno(1), p.lexpos(1));
     elif (p[2] == '-'):
         p[0] = Aritmetica(p[1], p[3], TipoAritmetica.RESTA, p.lineno(1), p.lexpos(1));
@@ -134,9 +131,33 @@ def p_expresion(p):
     elif (p[2] == '%'):
         p[0] = Aritmetica(p[1], p[3], TipoAritmetica.MODULO, p.lineno(1), p.lexpos(1));
 
+# impresión en consola (println)
+def p_imprimir(p):
+    """
+    imprimir : PRINTLN NOT PARENTESIS_ABRE CADENA COMA expresiones PARENTESIS_CIERRA
+        | PRINTLN NOT PARENTESIS_ABRE CADENA PARENTESIS_CIERRA
+    """
+    if (len(p) == 8):
+        p[0] = Imprimir(p[4], p[6], p.lineno(1), p.lexpos(1));
+    else:
+        p[0] = Imprimir(p[4], None, p.lineno(1), p.lexpos(1));
+
+# expresiones para el println
+def p_expresiones(p):
+    """
+    expresiones : expresiones COMA expresion
+        | expresion
+    """
+    if (len(p) == 3):
+        print(p[3])
+        p[1].append(p[3]); p[0] = p[1];
+    else:
+        print(p[1])
+        p[0] = [p[1]];  
+
 # error sintáctico
-def p_error(p):
-    print(f'Error de sintaxis {p.type}')
+# def p_error(p):
+#     print(f'Error de sintaxis {p.type}, linea: {p.lineno}, columna: {p.lexpos}')
 
 # construyendo el parser (analizador sintáctico)
 parser = yacc()

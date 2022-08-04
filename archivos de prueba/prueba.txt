@@ -1,0 +1,9 @@
+// empieza a escribir tu código...
+let sum : i64 = 5+5;
+let mult : i64 = 5*5;
+let div : i64 = 5/5;
+let _mod : i64 = 5%5;
+let _pow : i64 = i64::pow(3, 3);
+
+println!("el resultado de 5*5 es: {}, donde el primer termino es {} y el segundo es {}", 5*10, 5, 10);
+println!("soi una impresión simple");

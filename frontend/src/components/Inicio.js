@@ -13,22 +13,23 @@ const Inicio = () => {
         editorRef.current = editor;
     }
 
-  //   function showValue() {
-  //     const url = "http://localhost:9000/grammar";
-  //     const data = { data: editorRef.current.getValue().toLowerCase() };
-  //     console.log(data);
+    function showValue() {
+      const url = "http://localhost:5000/grammar";
+      // aki obtendremos el código de la página
+      const data = { data: editorRef.current.getValue().toLowerCase() };
+      console.log(data);
 
-  //     fetch(url, {
-  //       method: "POST", // or 'PUT'
-  //       body: JSON.stringify(data), // data can be `string` or {object}!
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     })
-  //       .then((res) => res.json())
-  //       .catch((error) => console.error("Error:", error))
-  //       .then((res) => setSalida(res.salida));
-  //   }
+      fetch(url, {
+        method: "POST", // or 'PUT'
+        body: JSON.stringify(data), // data can be `string` or {object}!
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .catch((error) => console.error("Error:", error))
+        .then((res) => console.log(res) /*setSalida(res.salida)*/);
+    }
 
   //   function crear() {
   //     editorRef.current.setValue("// empieza a escribir tu código...");
@@ -172,7 +173,7 @@ const Inicio = () => {
             </div>
           </div>
 
-          <button //onClick={showValue}
+          <button onClick={showValue}
             type="button"
             className="btn btn-light"
           >

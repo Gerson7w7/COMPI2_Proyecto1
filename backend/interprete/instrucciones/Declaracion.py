@@ -4,9 +4,9 @@ from ..extra.Console import Console
 from ..extra.Scope import Scope
 
 class Declaracion(Instruccion):
-    def __init__( self, mut:bool, id: str, tipo: str, valor, linea: int, columna: int):
+    def __init__(self, mut:bool, id: str, tipo: str, valor, linea: int, columna: int):
         super().__init__(linea, columna)
-        self.mut = mut;
+        self.mut = mut; 
         self.id = id;
         self.tipo = tipo;
         self.valor = valor;
@@ -30,13 +30,12 @@ class Declaracion(Instruccion):
 
         # variables inicializadas
         if (self.valor != None):
-            print("sisoi var")
             # obteniendo el valor de la expresion
             val = self.valor.ejecutar(console, scope);
             tipo = val.tipo if (tipo == None) else tipo;
             if (val.tipo == tipo):
                 print("siuuu var : " + self.id)
-                scope.crearVariable(self.id, val.valor, val.tipo, self.linea, self.columna);
+                scope.crearVariable(self.id, val.valor, val.tipo, self.mut, self.linea, self.columna);
             else:
                 # error, diferentes tipos de datos
                 pass;

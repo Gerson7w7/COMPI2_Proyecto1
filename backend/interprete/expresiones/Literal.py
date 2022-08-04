@@ -12,7 +12,6 @@ class Literal(Expresion):
     
     def ejecutar(self, console: Console, scope: Scope):
         if (self.tipo == TipoDato.INT64):
-            print("INTTTT : " + int(self.valor))
             return RetornoExpresion(int(self.valor), TipoDato.INT64);
         elif (self.tipo == TipoDato.FLOAT64):
             return RetornoExpresion(float(self.valor), TipoDato.FLOAT64);

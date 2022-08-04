@@ -129,7 +129,7 @@ def t_IDENTIFICADOR(t):
 
 # contamos las líneas del código
 def t_nuevalinea(t):
-    r'\n+';
+    r'(\r\n)+|\n+';
     t.lexer.lineno += len(t.value)
 
 # manejo de errores léxicos
