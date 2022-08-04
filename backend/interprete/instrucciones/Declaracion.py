@@ -34,7 +34,6 @@ class Declaracion(Instruccion):
             val = self.valor.ejecutar(console, scope);
             tipo = val.tipo if (tipo == None) else tipo;
             if (val.tipo == tipo):
-                print("siuuu var : " + self.id)
                 scope.crearVariable(self.id, val.valor, val.tipo, self.mut, self.linea, self.columna);
             else:
                 # error, diferentes tipos de datos

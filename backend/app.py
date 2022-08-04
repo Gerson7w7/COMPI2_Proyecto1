@@ -23,8 +23,9 @@ def grammar():
         scope: Scope = Scope(None)
         console: Console = Console();
         ast.ejecutar(console, scope)
+        print("soi console: " + console.output)
         return {
-            'resultado': 'result'
+            'salida': console.output
         }
 
 if __name__=='__main__':

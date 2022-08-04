@@ -10,12 +10,9 @@ class Imprimir(Instruccion):
 
     def ejecutar(self, console: Console, scope: Scope):
         if (self.expresiones != None):
-            print("entro acua")
             for expresion in self.expresiones:
                 val = expresion.ejecutar(console, scope)
-                self.cadena = self.cadena.replace('\{\}', str(val), 1);
-            print(self.cadena);
+                self.cadena = self.cadena.replace("{}", str(val.valor), 1);
             console.append(self.cadena + '\n');
         else:
-            print(self.cadena);
             console.append(self.cadena + '\n');

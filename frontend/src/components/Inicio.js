@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const Inicio = () => {
     const editorRef = useRef(null);
-  //   const [salida, setSalida] = useState("");
+    const [salida, setSalida] = useState("");
   //   const [nombre, setNombre] = useState("");
     let navigate = useNavigate();
 
@@ -28,7 +28,7 @@ const Inicio = () => {
       })
         .then((res) => res.json())
         .catch((error) => console.error("Error:", error))
-        .then((res) => console.log(res) /*setSalida(res.salida)*/);
+        .then((res) => setSalida(res.salida));
     }
 
   //   function crear() {
@@ -189,7 +189,7 @@ const Inicio = () => {
           className="form-control"
           id="terminal"
           rows="10"
-          //   value={salida}
+          value={salida}
           disabled
         ></textarea>
       </div>

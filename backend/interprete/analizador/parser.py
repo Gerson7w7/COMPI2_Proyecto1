@@ -148,11 +148,9 @@ def p_expresiones(p):
     expresiones : expresiones COMA expresion
         | expresion
     """
-    if (len(p) == 3):
-        print(p[3])
+    if (len(p) == 4):
         p[1].append(p[3]); p[0] = p[1];
     else:
-        print(p[1])
         p[0] = [p[1]];  
 
 # error sintáctico
