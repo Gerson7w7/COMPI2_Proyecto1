@@ -15,3 +15,16 @@ class TipoAritmetica(Enum):
     DIVISION = 4
     POTENCIA = 5
     MODULO = 6
+
+class TipoRelacional(Enum):
+    IGUALDAD = 1
+    DESIGUALDAD = 2
+    MENOR_IGUAL = 3
+    MAYOR_IGUAL = 4
+    MENOR = 5
+    MAYOR = 6
+
+class TipoLogico(Enum):
+    NOT = 1
+    AND = 2
+    OR = 3

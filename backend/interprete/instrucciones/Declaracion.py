@@ -13,30 +13,31 @@ class Declaracion(Instruccion):
 
     def ejecutar(self, console: Console, scope: Scope):
         # analizando el tipo de dato
-        tipo: TipoDato = None;
-        if (tipo != None):
+        _tipo: TipoDato = None;
+        if (self.tipo != None):
             if (self.tipo == 'i64'):
-                tipo = TipoDato.INT64
+                _tipo = TipoDato.INT64
             elif (self.tipo == 'f64'):
-                tipo = TipoDato.FLOAT64
+                _tipo = TipoDato.FLOAT64
             elif (self.tipo == 'bool'):
-                tipo = TipoDato.BOOLEAN
+                _tipo = TipoDato.BOOLEAN
             elif (self.tipo == 'char'):
-                tipo = TipoDato.CHAR
+                _tipo = TipoDato.CHAR
             elif (self.tipo == 'string'):
-                tipo = TipoDato.STRING
+                _tipo = TipoDato.STRING
             elif (self.tipo == 'str'):
-                tipo = TipoDato.STR
+                _tipo = TipoDato.STR
 
         # variables inicializadas
         if (self.valor != None):
             # obteniendo el valor de la expresion
             val = self.valor.ejecutar(console, scope);
-            tipo = val.tipo if (tipo == None) else tipo;
-            if (val.tipo == tipo):
+            _tipo = val.tipo if (_tipo == None) else _tipo;
+            if (val.tipo == _tipo):
                 scope.crearVariable(self.id, val.valor, val.tipo, self.mut, self.linea, self.columna);
             else:
                 # error, diferentes tipos de datos
+                print("error " + self.id)
                 pass;
         # variables no inicializadas
         else:

@@ -1,9 +1,39 @@
-// empieza a escribir tu código...
+// PRUEBA SIN ERRORES SIMPLE
 let sum : i64 = 5+5;
-let mult : i64 = 5*5;
+println!("sum: {} ", sum);
+let mut mult : i64 = 5*5;
+println!("mult: {} ", mult);
 let div : i64 = 5/5;
-let _mod : i64 = 5%5;
+println!("div: {} ", div);
+let _mod = 5%5;
+println!("_mod: {} ", _mod);
 let _pow : i64 = i64::pow(3, 3);
+println!("_pow: {} ", _pow);
+let negEntero = -10;
+println!("negEntero: {} ", negEntero);
+let negDecimal = -5.10;
+println!("negDecimal: {} ", negDecimal);
+//let theRialG = 5*5/10+5-6*7*8; // error pq no se puede operar float con int
+let theRialG2 = 5*5*10+5-6*7*8;
+println!("theRialG2: {} ", theRialG2);
+let mut igualdad:bool = 5 == 5; // true
+println!("igualdad: {} ", igualdad);
+let mut desigualdad = 1 != 3; // true
+println!("desigualdad: {} ", desigualdad);
+let menor_igual: bool = 5 <= 3; // false
+println!("menor_igual: {} ", menor_igual);
+let mayor_igual = 6 >= 3; //true
+println!("mayor_igual: {} ", mayor_igual);
+let menor = 6 < 6; //false
+println!("menor: {} ", menor);
+let mayor = 6 > 3; //true
+println!("mayor: {} ", mayor);
+let or = true || false; // true
+println!("or: {} ", or);
+let and = true && false; // false
+println!("and: {} ", and);
+let not = !true; // false
+println!("not: {} ", not);
 
 println!("el resultado de 5*10 es: {}, donde el primer termino es {} y el segundo es {}", 5*10, 5, 10);
 println!("soi una impresión simple");

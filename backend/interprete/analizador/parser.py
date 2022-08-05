@@ -4,11 +4,14 @@ from interprete.analizador import lexer
 
 import re
 from ..expresiones.Aritmetica import Aritmetica
-from ..extra.Tipos import TipoAritmetica, TipoDato
+from ..extra.Tipos import TipoAritmetica, TipoDato, TipoLogico, TipoRelacional
 from ..extra.Ast import Ast
 from ..instrucciones.Declaracion import Declaracion
 from ..expresiones.Literal import Literal
 from interprete.instrucciones.Imprimir import Imprimir
+from interprete.expresiones.Relacional import Relacional
+from ..expresiones.Logico import Logico
+from ..expresiones.Acceso import Acceso
 
 tokens = lexer.tokens;
 
@@ -81,15 +84,9 @@ def p_igualacion(p):
     p[0] = p[2];
 
 # unidad aritmética
-def p_expresion(p):
+def p_expresion_aritmetica(p):
     """
-    expresion : ENTERO
-        | DECIMAL   
-        | TRUE
-        | FALSE
-        | CARACTER
-        | CADENA
-        | RESTA expresion %prec UMENOS
+    expresion : RESTA expresion %prec UMENOS
         | I64 DOS_PUNTOS DOS_PUNTOS POTENCIA PARENTESIS_ABRE expresion COMA expresion PARENTESIS_CIERRA
         | expresion SUMA expresion
         | expresion RESTA expresion
@@ -97,30 +94,12 @@ def p_expresion(p):
         | expresion DIVISION expresion
         | expresion MODULO expresion
     """
-    if (len(p) == 2): 
-        # terminales
-        if (type(p[1]) == int):
-            # enteros
-            p[0] = Literal(p[1], TipoDato.INT64, p.lineno(1), p.lexpos(1));
-        elif (type(p[1]) == float):
-            # decimales
-            p[0] = Literal(p[1], TipoDato.FLOAT64, p.lineno(1), p.lexpos(1));
-        elif (p[1] == 'true' or p[1] == 'false'):
-            # bools
-            p[0] = Literal(p[1], TipoDato.BOOLEAN, p.lineno(1), p.lexpos(1));
-        elif (re.fullmatch(r'.', p[1])):
-            # chars
-            p[0] = Literal(p[1], TipoDato.CHAR, p.lineno(1), p.lexpos(1));
-        else:
-            # strings
-            p[0] = Literal(p[1], TipoDato.STRING, p.lineno(1), p.lexpos(1));
-    elif (len(p) == 3):
+    if (len(p) == 3):
         # numero negativo
-        p[0] = Aritmetica(p[2], -1, TipoAritmetica.MULTIPLICACION, p.lineno(1), p.lexpos(1));
+        p[0] = Aritmetica(p[2], Literal('-1', p[2].tipo, p.lineno(1), p.lexpos(1)), TipoAritmetica.MULTIPLICACION, p.lineno(1), p.lexpos(1));
     elif (len(p) == 10):
         p[0] = Aritmetica(p[6], p[8], TipoAritmetica.POTENCIA, p.lineno(1), p.lexpos(1));
     elif (p[2] == '+'):
-        print("sssuuuum")
         p[0] = Aritmetica(p[1], p[3], TipoAritmetica.SUMA, p.lineno(1), p.lexpos(1));
     elif (p[2] == '-'):
         p[0] = Aritmetica(p[1], p[3], TipoAritmetica.RESTA, p.lineno(1), p.lexpos(1));
@@ -130,6 +109,78 @@ def p_expresion(p):
         p[0] = Aritmetica(p[1], p[3], TipoAritmetica.DIVISION, p.lineno(1), p.lexpos(1));
     elif (p[2] == '%'):
         p[0] = Aritmetica(p[1], p[3], TipoAritmetica.MODULO, p.lineno(1), p.lexpos(1));
+
+# unidad relacional
+def p_expresion_relacional(p):
+    """
+    expresion : expresion IGUALDAD expresion
+        | expresion DESIGUALDAD expresion
+        | expresion MENOR_IGUAL expresion
+        | expresion MAYOR_IGUAL expresion
+        | expresion MENOR expresion
+        | expresion MAYOR expresion
+    """
+    if (p[2] == '=='):
+        p[0] = Relacional(p[1], p[3], TipoRelacional.IGUALDAD, p.lineno(1), p.lexpos(1));
+    elif (p[2] == '!='):
+        p[0] = Relacional(p[1], p[3], TipoRelacional.DESIGUALDAD, p.lineno(1), p.lexpos(1));
+    elif (p[2] == '<='):
+        p[0] = Relacional(p[1], p[3], TipoRelacional.MENOR_IGUAL, p.lineno(1), p.lexpos(1));
+    elif (p[2] == '>='):
+        p[0] = Relacional(p[1], p[3], TipoRelacional.MAYOR_IGUAL, p.lineno(1), p.lexpos(1));
+    elif (p[2] == '<'):
+        p[0] = Relacional(p[1], p[3], TipoRelacional.MENOR, p.lineno(1), p.lexpos(1));
+    elif (p[2] == '>'):
+        p[0] = Relacional(p[1], p[3], TipoRelacional.MAYOR, p.lineno(1), p.lexpos(1));
+
+# unidad lógica
+def p_expresion_logica(p):
+    """
+    expresion : NOT expresion
+        | expresion OR expresion
+        | expresion AND expresion
+    """
+    if (len(p) == 3):
+        p[0] = Logico(p[2], None, TipoLogico.NOT, p.lineno(1), p.lexpos(1))
+    elif (p[2] == '||'):
+        p[0] = Logico(p[1], p[3], TipoLogico.OR, p.lineno(1), p.lexpos(1))
+    elif (p[2] == '&&'):
+        p[0] = Logico(p[1], p[3], TipoLogico.AND, p.lineno(1), p.lexpos(1))
+
+def p_expresion_terminales(p):
+    """
+    expresion : ENTERO
+        | DECIMAL   
+        | TRUE
+        | FALSE
+        | CARACTER
+        | CADENA
+    """
+    # terminales
+    if (type(p[1]) == int):
+        # enteros
+        p[0] = Literal(p[1], TipoDato.INT64, p.lineno(1), p.lexpos(1));
+    elif (type(p[1]) == float):
+        # decimales
+        p[0] = Literal(p[1], TipoDato.FLOAT64, p.lineno(1), p.lexpos(1));
+    elif (p[1] == 'true' or p[1] == 'false'):
+        # bools
+        p[0] = Literal(p[1], TipoDato.BOOLEAN, p.lineno(1), p.lexpos(1));
+    elif (re.fullmatch(r'.', p[1])):
+        # chars
+        p[0] = Literal(p[1], TipoDato.CHAR, p.lineno(1), p.lexpos(1));
+    else:
+        # strings
+        p[0] = Literal(p[1], TipoDato.STRING, p.lineno(1), p.lexpos(1));
+
+def p_expresion_identificador(p):
+    """
+    expresion : IDENTIFICADOR
+    """
+    p[0] = Acceso(p[1], p.lineno(1), p.lexpos(1))
+
+# asignaciones
+# def p_asignacion(p):
 
 # impresión en consola (println)
 def p_imprimir(p):

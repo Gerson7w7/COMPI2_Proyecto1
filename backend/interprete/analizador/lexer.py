@@ -15,7 +15,7 @@ reservadas = {
     'true': 'TRUE', 
     'false': 'FALSE',
     'char': 'CHAR',
-    'string': 'STRING',
+    'String': 'STRING',
     'str': 'STR',
     'usize': 'USIZE', 
     'vec': 'VEC',
@@ -76,7 +76,6 @@ def t_DECIMAL(t):
 
 # tokens con expresiones regulares simples
 t_INTERROGACION = r'\?';
-t_AMPERSON = r'\&';
 t_CORCHETE_ABRE = r'\[';
 t_CORCHETE_CIERRA = r'\]';
 t_PARENTESIS_ABRE = r'\(';
@@ -94,16 +93,17 @@ t_DIVISION = r'/';
 t_MODULO = r'%';
 t_IGUALDAD = r'==';
 t_DESIGUALDAD = r'!=';
-t_IGUALACION = r'=';
+t_MENOR_IGUAL = r'<=';
+t_MAYOR_IGUAL = r'>=';
 t_MENOR = r'<';
 t_MAYOR = r'>';
-t_MENOR_IGUAL = r'=<';
-t_MAYOR_IGUAL = r'=>';
+t_IGUALACION = r'=';
 t_OR = r'\|\|';
 t_AND = r'&&';
 t_NOT = r'!';
 t_FLECHA_GUION = r'->';
 t_FLECHA_IGUAL = r'=>';
+t_AMPERSON = r'\&';
 t_GUION_BAJO = r'_';
 
 # tokens con expresiones regulares más elaborados y con acciones de código

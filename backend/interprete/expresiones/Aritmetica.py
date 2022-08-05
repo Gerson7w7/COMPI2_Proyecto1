@@ -16,7 +16,7 @@ class Aritmetica(Expresion):
         valIzquierda = self.izquierda.ejecutar(console, scope);
         # valor y tipo de la derecha
         valDerecha = self.derecha.ejecutar(console, scope);
-
+        
         # verificando que sea del mismo tipo de dato
         if ((valIzquierda.tipo == valDerecha.tipo) or (valIzquierda.tipo == TipoDato.STRING and valIzquierda.tipo == TipoDato.STR)):
             # si es una suma

@@ -33,7 +33,7 @@ class Scope:
             if (scope.variables.get(id) != None):
                 return scope.variables.get(id);
             scope = scope.padre;
-        # error: no se ha declarado la variable
+        # error: no se ha encontrado la variable
 
     # función para obtener el scopeo más general, el global
     def getGlobal(self):
