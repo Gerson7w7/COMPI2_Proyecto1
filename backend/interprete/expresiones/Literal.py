@@ -20,5 +20,5 @@ class Literal(Expresion):
         elif (self.tipo == TipoDato.CHAR):
             return RetornoExpresion(self.valor, TipoDato.CHAR);
         elif (self.tipo == TipoDato.STRING or self.tipo == TipoDato.STR):
-            return RetornoExpresion(float(self.valor), TipoDato.BOOLEAN);
+            return RetornoExpresion(self.valor, TipoDato.STRING);
         # sino error sintactico

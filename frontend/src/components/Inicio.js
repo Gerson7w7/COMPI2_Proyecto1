@@ -16,7 +16,7 @@ const Inicio = () => {
     function showValue() {
       const url = "http://localhost:5000/grammar";
       // aki obtendremos el código de la página
-      const data = { data: editorRef.current.getValue().toLowerCase() };
+      const data = { data: editorRef.current.getValue() };
       console.log(data);
 
       fetch(url, {

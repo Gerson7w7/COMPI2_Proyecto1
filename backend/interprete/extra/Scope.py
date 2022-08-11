@@ -1,5 +1,4 @@
 # clase para manejar los entornos, ambitos, env o scopes
-import this
 from ..extra.TablaSimbolo import TablaSimbolo
 from .Tipos import TipoDato 
 from .Simbolo import Simbolo
@@ -41,3 +40,19 @@ class Scope:
         while(scope.padre != None):
             scope = scope.padre;
         return scope;
+
+    def setValor(self, id:str, valor, linea:int, columna:int):
+        scope: Scope = self;
+        while(scope != None):
+            if (scope.variables.get(id) != None):
+                val = scope.variables.get(id);
+                if (val.tipo == valor.tipo):
+                    if (val.mut):
+                        scope.variables.update({id : Simbolo(valor.valor, id, valor.tipo, True)});
+                    else:
+                        # error, variable no mutable
+                        pass;
+                else:
+                    # error tipos incopatibles
+                    pass;
+            scope = scope.padre;

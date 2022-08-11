@@ -6,12 +6,15 @@ import re
 from ..expresiones.Aritmetica import Aritmetica
 from ..extra.Tipos import TipoAritmetica, TipoDato, TipoLogico, TipoRelacional
 from ..extra.Ast import Ast
-from ..instrucciones.Declaracion import Declaracion
+from ..instrucciones.Declaracion import Declaracion, Asignacion
 from ..expresiones.Literal import Literal
 from interprete.instrucciones.Imprimir import Imprimir
 from interprete.expresiones.Relacional import Relacional
 from ..expresiones.Logico import Logico
 from ..expresiones.Acceso import Acceso
+from interprete.instrucciones.Bloque import Bloque
+from interprete.instrucciones.IfElse import IfElse
+from interprete.instrucciones.Match import Case, Match
 
 tokens = lexer.tokens;
 
@@ -31,19 +34,23 @@ def p_inicio(p):
 # lista de instrucciones
 def p_instrucciones(p):
     """
-    instrucciones : instrucciones instruccion
+    instrucciones : instrucciones instruccion 
         | instruccion
     """
     if (len(p) == 3):
         p[1].append(p[2]); p[0] = p[1];
     else:
-        p[0] = [p[1]];     
+        p[0] = [p[1]];
 
 # declaracion de variables
 def p_instruccion(p):
     """
     instruccion : declaracion PUNTO_COMA
         | imprimir PUNTO_COMA
+        | asignacion PUNTO_COMA
+        | if
+        | match
+        | expresion
     """
     p[0] = p[1];
 
@@ -179,8 +186,13 @@ def p_expresion_identificador(p):
     """
     p[0] = Acceso(p[1], p.lineno(1), p.lexpos(1))
 
-# asignaciones
-# def p_asignacion(p):
+def p_expresion_inst(p):
+    """
+    expresion : if
+        | match
+        | imprimir
+    """
+    p[0] = p[1];
 
 # impresión en consola (println)
 def p_imprimir(p):
@@ -203,6 +215,85 @@ def p_expresiones(p):
         p[1].append(p[3]); p[0] = p[1];
     else:
         p[0] = [p[1]];  
+
+def p_asignacion(p):
+    """
+    asignacion : IDENTIFICADOR igualacion
+    """
+    p[0] = Asignacion(p[1], p[2], p.lineno(1), p.lexpos(1))
+
+def p_if(p):
+    """
+    if : IF expresion bloque else
+    """
+    p[0] = IfElse(p[2], p[3], p[4], p.lineno(1), p.lexpos(1));
+
+def p_else(p):
+    """
+    else : ELSE bloque
+        | ELSE if
+        | empty
+    """
+    if (len(p) == 3):
+        p[0] = p[2];
+    else:
+        p[0] = p[1];
+
+def p_bloque(p):
+    """
+    bloque : LLAVE_ABRE instrucciones LLAVE_CIERRA
+        | LLAVE_ABRE LLAVE_CIERRA
+    """
+    if (len(p) == 4):
+        p[0] = Bloque(p[2], p.lineno(1), p.lexpos(1));
+    else:
+        p[0] = Bloque([], p.lineno(1), p.lexpos(1));
+
+def p_match(p):
+    """
+    match : MATCH expresion LLAVE_ABRE case_list LLAVE_CIERRA
+    """
+    p[0] = Match(p[2], p[4], p.lineno(1), p.lexpos(1));
+
+def p_case_list(p):
+    """
+    case_list : case_list case
+        | case
+    """
+    if (len(p) == 3):
+        p[1].append(p[2]); p[0] = p[1];
+    else:
+        p[0] = [p[1]];   
+
+def p_case(p):
+    """
+    case : coincidencias FLECHA_IGUAL cuerpo_match
+    """
+    p[0] = Case(p[1], p[3], p.lineno(1), p.lexpos(1));
+
+def p_coincidencias(p):
+    """
+    coincidencias : coincidencias BARRA expresion
+        | expresion
+        | GUION_BAJO
+    """
+    if (len(p) == 4):
+        p[1].append(p[2]); p[0] = p[1];
+    else:
+        p[0] = [p[1]];  
+
+def p_cuerpo_match(p):
+    """
+    cuerpo_match : expresion COMA
+        | bloque
+    """
+    p[0] = p[1];
+
+def p_empty(p):
+    """
+    empty :
+    """
+    p[0] = None;
 
 # error sintáctico
 # def p_error(p):

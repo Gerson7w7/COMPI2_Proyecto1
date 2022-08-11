@@ -37,3 +37,28 @@ println!("not: {} ", not);
 
 println!("el resultado de 5*10 es: {}, donde el primer termino es {} y el segundo es {}", 5*10, 5, 10);
 println!("soi una impresión simple");
+
+let mut mutable: i64 = 5*5;
+println!("mutable1: {}", mutable);
+
+mutable = mutable + 5;
+println!("mutable1: {}", mutable);
+
+let mut condicion = 5;
+
+if condicion <= 5 {
+    println!("siuuuuuuuu menor_igual");
+} else if condicion == 5 {
+    println!("siuuu igual");
+} else {
+    println!("elseeeeee");
+}
+
+let mut _if = if condicion == 5 {"SOI 5"} else {"NOSOI 5"};
+println!("{}", _if);
+
+match condicion {
+    1|2|3 => println!("estoi entre 1 a 3 :D {}", condicion),
+    4|5|6 => {println!("estoi entre 4 a 6 :D {}", condicion);}
+    _ => println!("estoi entre 7 a infinitoosiuuu :D {}", condicion),
+}

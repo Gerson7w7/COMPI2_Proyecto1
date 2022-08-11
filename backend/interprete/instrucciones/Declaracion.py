@@ -33,6 +33,9 @@ class Declaracion(Instruccion):
             # obteniendo el valor de la expresion
             val = self.valor.ejecutar(console, scope);
             _tipo = val.tipo if (_tipo == None) else _tipo;
+            # asegurandonos de que si es un &str se cambie de string str
+            if (_tipo == TipoDato.STR and val.tipo == TipoDato.STRING):
+                val.tipo = _tipo;
             if (val.tipo == _tipo):
                 scope.crearVariable(self.id, val.valor, val.tipo, self.mut, self.linea, self.columna);
             else:
@@ -42,3 +45,13 @@ class Declaracion(Instruccion):
         # variables no inicializadas
         else:
             pass;
+
+class Asignacion(Instruccion):
+    def __init__(self, id:str, expresion, linea: int, columna: int):
+        super().__init__(linea, columna)
+        self.id = id;
+        self.expresion = expresion;
+
+    def ejecutar(self, console: Console, scope: Scope):
+        val = self.expresion.ejecutar(console, scope);
+        scope.setValor(self.id, val, self.linea, self.columna);

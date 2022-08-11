@@ -61,7 +61,7 @@ tokens = [
     'OR', 'AND', 'NOT', # lógicos
     # funciones
     'FLECHA_GUION', # funciones y métodos
-    'FLECHA_IGUAL', 'GUION_BAJO', # match (similar al switch)
+    'FLECHA_IGUAL', 'GUION_BAJO', 'BARRA', # match (similar al switch)
     # identificadores
     'IDENTIFICADOR',
 ] + list(reservadas.values())
@@ -105,6 +105,7 @@ t_FLECHA_GUION = r'->';
 t_FLECHA_IGUAL = r'=>';
 t_AMPERSON = r'\&';
 t_GUION_BAJO = r'_';
+t_BARRA = r'\|';
 
 # tokens con expresiones regulares más elaborados y con acciones de código
 def t_ENTERO(t):
