@@ -13,13 +13,10 @@ class Relacional(Expresion):
 
     def ejecutar(self, console: Console, scope: Scope):
         # ejecutando las expresiones
-        print ( self.izquierda)
-        print (self.derecha)
-        print (self.izquierda.ejecutar(console, scope))
-        val1:RetornoExpresion = self.izquierda.ejecutar(console, scope);
+        val1 = self.izquierda.ejecutar(console, scope);
         val2 = self.derecha.ejecutar(console, scope);
-        print("val1: " +val1.valor)
-        print("val2: " +val2.valor)
+        print("val1: " +str(val1.valor))
+        print("val2: " +str(val2.valor))
         esStr = False;
         if (val1.tipo == TipoDato.STRING or val1.tipo == TipoDato.STR):
             if (val2.tipo == TipoDato.STRING or val2.tipo == TipoDato.STR):
