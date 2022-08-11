@@ -44,6 +44,7 @@ reservadas = {
     'break': 'BREAK',
     'continue': 'CONTINUE',
     'return': 'RETURN',
+    '_': 'GUION_BAJO',
 }
 
 # definimos los tokens de nuestro lenguaje
@@ -104,7 +105,6 @@ t_NOT = r'!';
 t_FLECHA_GUION = r'->';
 t_FLECHA_IGUAL = r'=>';
 t_AMPERSON = r'\&';
-t_GUION_BAJO = r'_';
 t_BARRA = r'\|';
 
 # tokens con expresiones regulares más elaborados y con acciones de código
