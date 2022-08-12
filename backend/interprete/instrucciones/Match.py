@@ -16,15 +16,11 @@ class Match(Instruccion):
             condicionValida = False;
             # verificamos la se cumple la igualdad del o los cases
             for condicion in case.comparar():
-                print("condicon" + str(condicion))
                 if (condicion == '_'):
-                    print("default");
                     condicionValida = True;
                     break;
                 else:
-                    print("queondalopibeeeeeeeeeeeee");
                     condicionValida = Relacional(self.expresion, condicion, TipoRelacional.IGUALDAD, self.linea, self.columna).ejecutar(console, scope).valor;
-                    print("queondalopibe: " + str(condicionValida));
                     if (condicionValida): break;
             # si se cumple, ejecutamos el case
             if (condicionValida):

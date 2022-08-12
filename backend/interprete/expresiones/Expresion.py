@@ -6,5 +6,5 @@ class Expresion:
         self.linea: int = linea;
         self.columna: int = columna;
 
-    def ejecutar(console: Console, scope: Scope):
+    def ejecutar(self, console: Console, scope: Scope):
         pass; 

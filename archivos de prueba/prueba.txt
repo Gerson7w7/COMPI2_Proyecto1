@@ -9,6 +9,8 @@ let _mod = 5%5;
 println!("_mod: {} ", _mod);
 let _pow : i64 = i64::pow(3, 3);
 println!("_pow: {} ", _pow);
+let _powf : f64 = f64::powf(3.2, 3.0);
+println!("_powf: {} ", _powf);
 let negEntero = -10;
 println!("negEntero: {} ", negEntero);
 let negDecimal = -5.10;
@@ -38,14 +40,14 @@ println!("not: {} ", not);
 println!("el resultado de 5*10 es: {}, donde el primer termino es {} y el segundo es {}", 5*10, 5, 10);
 println!("soi una impresión simple");
 
+// =======================================
 let mut mutable: i64 = 5*5;
-println!("mutable1: {}", mutable);
-
+println!("mutable: {}", mutable);
 mutable = mutable + 5;
-println!("mutable1: {}", mutable);
+println!("mutable: {}", mutable);
 
+// =======================================
 let mut condicion = 5;
-
 if condicion <= 5 {
     println!("siuuuuuuuu menor_igual");
 } else if condicion == 5 {
@@ -54,11 +56,76 @@ if condicion <= 5 {
     println!("elseeeeee");
 }
 
+// =======================================
 let mut _if = if condicion == 5 {"SOI 5"} else {"NOSOI 5"};
 println!("{}", _if);
 
+// =======================================
 match condicion {
     1|2|3 => println!("estoi entre 1 a 3 :D {}", condicion),
     4|5|6 => {println!("estoi entre 4 a 6 :D {}", condicion);}
     _ => println!("estoi entre 7 a infinitoosiuuu :D {}", condicion),
 }
+
+// =======================================
+let mut _loop:i64 = 0;
+loop {
+    if _loop == 5 {
+        break;
+    }
+    println!("loop : {}", _loop)
+    _loop = _loop+1;
+}
+
+// =======================================
+let mut _loop:i64 = 0;
+let mut flag = true;
+let _final = 
+loop {
+    println!("loop: {}", _loop);
+    if flag && _loop == 5 {
+        flag = !flag;
+        continue;
+    } else if _loop == 10 {
+        break _loop;
+    }
+    _loop = _loop+1;
+};
+println!("finallll : {}", _final);
+
+// =======================================
+let mut var1 = 0;
+let mut flag = true;
+while var1 < 10 {
+    println!("{}", var1); // imprime 0123456789
+    if flag && var1 == 5 {
+        println!("soi un continue");
+        flag = !flag;
+        continue;
+    }
+    var1 = var1 + 1;
+}
+
+// ========== ABS ===========
+let mut absoluto = -50.abs();
+println!("{}", absoluto);
+let mut absoluto2 = -10.20.abs();
+println!("{}", absoluto2);
+
+// ======= SQRT =========
+let mut cuadrado = 4.sqrt();
+println!("{}", cuadrado);
+let mut cuadrado2 = -9.5.sqrt();
+println!("{}", cuadrado2);
+
+// ======== TOSTRING ========
+let mut toString: String = "ola".to_string();
+println!("{}", toString);
+let mut toOwned: String = "queondalopibe".to_owned();
+println!("{}", toOwned);
+
+// ======== CLONE =======
+let original: i64 = 55;
+let copia = original.clone();
+println!("original: {}", original);
+println!("copia: {}", copia);

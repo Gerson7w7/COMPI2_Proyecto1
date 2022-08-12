@@ -1,8 +1,8 @@
+from .Transferencia import Transferencia
 from .Instruccion import Instruccion
 from ..extra.Scope import Scope
 from ..extra.Console import Console
 from ..extra.Retorno import RetornoExpresion
-from ..extra.Tipos import TipoDato
 
 class Bloque(Instruccion):
     def __init__(self, instrucciones:list, linea: int, columna: int):
@@ -14,10 +14,10 @@ class Bloque(Instruccion):
         newScope = Scope(scope);
 
         for instruccion in self.instrucciones:
-            try:
-                val = instruccion.ejecutar(console, newScope);
-                if (val != None):
-                    return RetornoExpresion(val.valor, val.tipo);
-            except:
+            #try:
+            val = instruccion.ejecutar(console, newScope);
+            if (val != None):
+                return val;
+            #except:
                 # errores para la recuperacion 
-                pass;
+                #pass;

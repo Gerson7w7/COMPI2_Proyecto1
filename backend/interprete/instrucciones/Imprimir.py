@@ -10,9 +10,10 @@ class Imprimir(Instruccion):
 
     def ejecutar(self, console: Console, scope: Scope):
         if (self.expresiones != None):
+            nuevaCadena:str = "";
             for expresion in self.expresiones:
                 val = expresion.ejecutar(console, scope)
-                self.cadena = self.cadena.replace("{}", str(val.valor), 1);
-            console.append(self.cadena + '\n');
+                nuevaCadena = self.cadena.replace("{}", str(val.valor), 1);
+            console.append(nuevaCadena + '\n');
         else:
             console.append(self.cadena + '\n');

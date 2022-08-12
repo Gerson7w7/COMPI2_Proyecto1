@@ -4,7 +4,7 @@ from interprete.analizador import lexer
 
 import re
 from ..expresiones.Aritmetica import Aritmetica
-from ..extra.Tipos import TipoAritmetica, TipoDato, TipoLogico, TipoRelacional
+from ..extra.Tipos import TipoAritmetica, TipoDato, TipoLogico, TipoNativo, TipoRelacional, TipoTransferencia
 from ..extra.Ast import Ast
 from ..instrucciones.Declaracion import Declaracion, Asignacion
 from ..expresiones.Literal import Literal
@@ -15,6 +15,10 @@ from ..expresiones.Acceso import Acceso
 from interprete.instrucciones.Bloque import Bloque
 from interprete.instrucciones.IfElse import IfElse
 from interprete.instrucciones.Match import Case, Match
+from ..instrucciones.Transferencia import Transferencia
+from ..instrucciones.Loop import Loop
+from ..expresiones.FuncionesNativas import Abs, Clone, Sqrt, ToString
+from ..instrucciones.While import While
 
 tokens = lexer.tokens;
 
@@ -51,6 +55,25 @@ def p_instruccion(p):
         | if
         | match
         | expresion
+        | loop
+        | while
+        | BREAK retorno PUNTO_COMA
+        | CONTINUE PUNTO_COMA
+        | RETURN retorno PUNTO_COMA
+    """
+    if (p[1] == 'break'):
+        p[0] = Transferencia(p[2], TipoTransferencia.BREAK, p.lineno(1), p.lexpos(1));
+    elif(p[1] == 'continue'):
+        p[0] = Transferencia(None, TipoTransferencia.CONTINUE, p.lineno(1), p.lexpos(1));
+    elif(p[1] == 'return'):
+        p[0] = Transferencia(p[2], TipoTransferencia.RETURN, p.lineno(1), p.lexpos(1));
+    else:
+        p[0] = p[1];
+    
+def p_retorno(p):
+    """
+    retorno : expresion
+        | empty
     """
     p[0] = p[1];
 
@@ -94,7 +117,7 @@ def p_igualacion(p):
 def p_expresion_aritmetica(p):
     """
     expresion : RESTA expresion %prec UMENOS
-        | I64 DOS_PUNTOS DOS_PUNTOS POTENCIA PARENTESIS_ABRE expresion COMA expresion PARENTESIS_CIERRA
+        | potencia PARENTESIS_ABRE expresion COMA expresion PARENTESIS_CIERRA
         | expresion SUMA expresion
         | expresion RESTA expresion
         | expresion MULTIPLICACION expresion
@@ -104,8 +127,10 @@ def p_expresion_aritmetica(p):
     if (len(p) == 3):
         # numero negativo
         p[0] = Aritmetica(p[2], Literal('-1', p[2].tipo, p.lineno(1), p.lexpos(1)), TipoAritmetica.MULTIPLICACION, p.lineno(1), p.lexpos(1));
-    elif (len(p) == 10):
-        p[0] = Aritmetica(p[6], p[8], TipoAritmetica.POTENCIA, p.lineno(1), p.lexpos(1));
+    elif (p[1] == 'i64'):
+        p[0] = Aritmetica(p[3], p[5], TipoAritmetica.POTENCIA_i64, p.lineno(1), p.lexpos(1));
+    elif (p[1] == 'f64'):
+        p[0] = Aritmetica(p[3], p[5], TipoAritmetica.POTENCIA_f64, p.lineno(1), p.lexpos(1));
     elif (p[2] == '+'):
         p[0] = Aritmetica(p[1], p[3], TipoAritmetica.SUMA, p.lineno(1), p.lexpos(1));
     elif (p[2] == '-'):
@@ -116,6 +141,13 @@ def p_expresion_aritmetica(p):
         p[0] = Aritmetica(p[1], p[3], TipoAritmetica.DIVISION, p.lineno(1), p.lexpos(1));
     elif (p[2] == '%'):
         p[0] = Aritmetica(p[1], p[3], TipoAritmetica.MODULO, p.lineno(1), p.lexpos(1));
+
+def p_potencia(p):
+    """
+    potencia : I64 DOS_PUNTOS DOS_PUNTOS POTENCIA_i64
+        | F64 DOS_PUNTOS DOS_PUNTOS POTENCIA_f64
+    """
+    p[0] = p[1];
 
 # unidad relacional
 def p_expresion_relacional(p):
@@ -191,8 +223,46 @@ def p_expresion_inst(p):
     expresion : if
         | match
         | imprimir
+        | asignacion
+        | loop
     """
     p[0] = p[1];
+
+def p_expresion_nativas(p):
+    """
+    expresion : expresion PUNTO funcion_nativa PARENTESIS_ABRE PARENTESIS_CIERRA
+    """
+    if(p[3] == TipoNativo.ABS):
+        p[0] = Abs(p[1], p.lineno(1), p.lexpos(1));
+    elif(p[3] == TipoNativo.SQRT):
+        p[0] = Sqrt(p[1], p.lineno(1), p.lexpos(1));
+    elif(p[3] == TipoNativo.TO_STRING or p[3] == TipoNativo.TO_OWNED):
+        p[0] = ToString(p[1], p.lineno(1), p.lexpos(1));
+    elif(p[3] == TipoNativo.CLONE):
+        p[0] = Clone(p[1], p.lineno(1), p.lexpos(1));
+    
+
+def p_funcion_nativa(p):
+    """
+    funcion_nativa : ABS
+        | SQRT
+        | TO_STRING
+        | CLONE
+        | TO_OWNED
+        | CHARS
+    """
+    if (p[1] == 'abs'):
+        p[0] = TipoNativo.ABS;
+    elif (p[1] == 'sqrt'):
+        p[0] = TipoNativo.SQRT;
+    elif (p[1] == 'to_string'):
+        p[0] = TipoNativo.TO_STRING;
+    elif (p[1] == 'clone'):
+        p[0] = TipoNativo.CLONE;
+    elif (p[1] == 'to_owned'):
+        p[0] = TipoNativo.TO_OWNED;
+    elif (p[1] == 'chars'):
+        p[0] = TipoNativo.CHARS;
 
 # impresión en consola (println)
 def p_imprimir(p):
@@ -288,6 +358,18 @@ def p_cuerpo_match(p):
         | bloque
     """
     p[0] = p[1];
+
+def p_loop(p):
+    """
+    loop : LOOP bloque
+    """
+    p[0] = Loop(p[2], p.lineno(1), p.lexpos(1));
+
+def p_while(p):
+    """
+    while : WHILE expresion bloque
+    """
+    p[0] = While(p[2], p[3], p.lineno(1), p.lexpos(1));
 
 def p_empty(p):
     """

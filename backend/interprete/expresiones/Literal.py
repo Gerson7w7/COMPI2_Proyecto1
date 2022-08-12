@@ -12,13 +12,13 @@ class Literal(Expresion):
     
     def ejecutar(self, console: Console, scope: Scope):
         if (self.tipo == TipoDato.INT64):
-            return RetornoExpresion(int(self.valor), TipoDato.INT64);
+            return RetornoExpresion(int(self.valor), TipoDato.INT64, None);
         elif (self.tipo == TipoDato.FLOAT64):
-            return RetornoExpresion(float(self.valor), TipoDato.FLOAT64);
+            return RetornoExpresion(float(self.valor), TipoDato.FLOAT64, None);
         elif (self.tipo == TipoDato.BOOLEAN):
-            return RetornoExpresion(self.valor, TipoDato.BOOLEAN);
+            return RetornoExpresion(self.valor, TipoDato.BOOLEAN, None);
         elif (self.tipo == TipoDato.CHAR):
-            return RetornoExpresion(self.valor, TipoDato.CHAR);
+            return RetornoExpresion(self.valor, TipoDato.CHAR, None);
         elif (self.tipo == TipoDato.STRING or self.tipo == TipoDato.STR):
-            return RetornoExpresion(self.valor, TipoDato.STRING);
+            return RetornoExpresion(self.valor, TipoDato.STR, None);
         # sino error sintactico

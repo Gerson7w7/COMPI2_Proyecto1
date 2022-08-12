@@ -23,14 +23,14 @@ class Logico(Expresion):
                 # OR
                 if (self.tipo == TipoLogico.OR):
                     print("or: " + str(val1.valor or val2.valor))
-                    return RetornoExpresion(val1.valor or val2.valor, TipoDato.BOOLEAN);
+                    return RetornoExpresion(val1.valor or val2.valor, TipoDato.BOOLEAN, None);
                 # AND
                 print("and: " + str(val1.valor and val2.valor))
-                return RetornoExpresion(val1.valor and val2.valor, TipoDato.BOOLEAN);
+                return RetornoExpresion(val1.valor and val2.valor, TipoDato.BOOLEAN, None);
             # error solo se acepta bools
         else:
             # NOT
             if (val1.tipo == TipoDato.BOOLEAN):
                 print("not: " + str(not val1.valor))
-                return RetornoExpresion(not val1.valor, TipoDato.BOOLEAN);
+                return RetornoExpresion(not val1.valor, TipoDato.BOOLEAN, None);
             # ERROR solo se aceptan bools 

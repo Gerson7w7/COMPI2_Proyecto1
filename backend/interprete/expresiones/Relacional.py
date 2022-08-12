@@ -15,8 +15,6 @@ class Relacional(Expresion):
         # ejecutando las expresiones
         val1 = self.izquierda.ejecutar(console, scope);
         val2 = self.derecha.ejecutar(console, scope);
-        print("val1: " +str(val1.valor))
-        print("val2: " +str(val2.valor))
         esStr = False;
         if (val1.tipo == TipoDato.STRING or val1.tipo == TipoDato.STR):
             if (val2.tipo == TipoDato.STRING or val2.tipo == TipoDato.STR):
@@ -33,20 +31,20 @@ class Relacional(Expresion):
     def Operando(self, val1, val2):
         if (self.tipo == TipoRelacional.IGUALDAD):
             print("igualdad : " + str(val1.valor ==val2.valor))
-            return RetornoExpresion(val1.valor == val2.valor, TipoDato.BOOLEAN);
+            return RetornoExpresion(val1.valor == val2.valor, TipoDato.BOOLEAN, None);
         elif (self.tipo == TipoRelacional.DESIGUALDAD):
             print("desigualdad : " + str(val1.valor !=val2.valor))
-            return RetornoExpresion(val1.valor != val2.valor, TipoDato.BOOLEAN);
+            return RetornoExpresion(val1.valor != val2.valor, TipoDato.BOOLEAN, None);
         elif (self.tipo == TipoRelacional.MENOR_IGUAL):
             print("menorigual : " + str(val1.valor <=val2.valor))
-            return RetornoExpresion(val1.valor <= val2.valor, TipoDato.BOOLEAN);
+            return RetornoExpresion(val1.valor <= val2.valor, TipoDato.BOOLEAN, None);
         elif (self.tipo == TipoRelacional.MAYOR_IGUAL):
             print("mayorigual : " + str(val1.valor >=val2.valor))
-            return RetornoExpresion(val1.valor >= val2.valor, TipoDato.BOOLEAN);
+            return RetornoExpresion(val1.valor >= val2.valor, TipoDato.BOOLEAN, None);
         elif (self.tipo == TipoRelacional.MENOR):
             print("menor : " + str(val1.valor < val2.valor))
-            return RetornoExpresion(val1.valor < val2.valor, TipoDato.BOOLEAN);
+            return RetornoExpresion(val1.valor < val2.valor, TipoDato.BOOLEAN, None);
         elif (self.tipo == TipoRelacional.MAYOR):
             print("mayor : " + str(val1.valor > val2.valor))
-            return RetornoExpresion(val1.valor > val2.valor, TipoDato.BOOLEAN);
+            return RetornoExpresion(val1.valor > val2.valor, TipoDato.BOOLEAN, None);
         # ERROR no se ha podido operar

@@ -23,7 +23,7 @@ class Declaracion(Instruccion):
                 _tipo = TipoDato.BOOLEAN
             elif (self.tipo == 'char'):
                 _tipo = TipoDato.CHAR
-            elif (self.tipo == 'string'):
+            elif (self.tipo == 'String'):
                 _tipo = TipoDato.STRING
             elif (self.tipo == 'str'):
                 _tipo = TipoDato.STR
@@ -33,14 +33,12 @@ class Declaracion(Instruccion):
             # obteniendo el valor de la expresion
             val = self.valor.ejecutar(console, scope);
             _tipo = val.tipo if (_tipo == None) else _tipo;
-            # asegurandonos de que si es un &str se cambie de string str
-            if (_tipo == TipoDato.STR and val.tipo == TipoDato.STRING):
-                val.tipo = _tipo;
+            # asegurandonos de que sea el mismo tipo de dato para crear la variable
             if (val.tipo == _tipo):
                 scope.crearVariable(self.id, val.valor, val.tipo, self.mut, self.linea, self.columna);
             else:
                 # error, diferentes tipos de datos
-                print("error " + self.id)
+                print("error::: " + self.id)
                 pass;
         # variables no inicializadas
         else:

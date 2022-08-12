@@ -20,7 +20,8 @@ reservadas = {
     'usize': 'USIZE', 
     'vec': 'VEC',
     'struct': 'STRUCT',
-    'pow': 'POTENCIA',
+    'powf': 'POTENCIA_f64',
+    'pow': 'POTENCIA_i64',
     'println': 'PRINTLN', # impresión
     'fn': 'FN',
     'abs': 'ABS', 
@@ -45,6 +46,8 @@ reservadas = {
     'continue': 'CONTINUE',
     'return': 'RETURN',
     '_': 'GUION_BAJO',
+    'to_owned': 'TO_OWNED',
+    'chars': 'CHARS'
 }
 
 # definimos los tokens de nuestro lenguaje
