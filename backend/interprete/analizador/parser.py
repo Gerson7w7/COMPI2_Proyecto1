@@ -11,7 +11,7 @@ from ..expresiones.Literal import Literal
 from interprete.instrucciones.Imprimir import Imprimir
 from interprete.expresiones.Relacional import Relacional
 from ..expresiones.Logico import Logico
-from ..expresiones.Acceso import Acceso
+from ..expresiones.Acceso import Acceso, AccesoArreglo
 from interprete.instrucciones.Bloque import Bloque
 from interprete.instrucciones.IfElse import IfElse
 from interprete.instrucciones.Match import Case, Match
@@ -19,6 +19,9 @@ from ..instrucciones.Transferencia import Transferencia
 from ..instrucciones.Loop import Loop
 from ..expresiones.FuncionesNativas import Abs, Clone, Sqrt, ToString
 from ..instrucciones.While import While
+from ..expresiones.Casteo import Casteo
+from ..instrucciones.Arreglo import Dimension, Arreglo
+from ..expresiones.Expresion import Expresion
 
 tokens = lexer.tokens;
 
@@ -79,19 +82,38 @@ def p_retorno(p):
 
 def p_declaracion(p):
     """
-    declaracion : LET MUT IDENTIFICADOR DOS_PUNTOS type igualacion
+    declaracion : LET MUT IDENTIFICADOR DOS_PUNTOS declaracion_tipo igualacion
         | LET MUT IDENTIFICADOR igualacion
-        | LET IDENTIFICADOR DOS_PUNTOS type igualacion
+        | LET IDENTIFICADOR DOS_PUNTOS declaracion_tipo igualacion
         | LET IDENTIFICADOR igualacion
     """
     if (len(p) == 7):
-        p[0] = Declaracion(True, p[3], p[5], p[6], p.lineno(1), p.lexpos(1));
+        if (isinstance(p[6], Expresion) == True):
+            p[0] = Declaracion(True, p[3], p[5], p[6], p.lineno(1), p.lexpos(1));
+        else:
+            p[0] = Arreglo(True, p[3], p[5], p[6], p.lineno(1), p.lexpos(1))
     elif (len(p) == 5):
-        p[0] = Declaracion(True, p[3], None, p[4], p.lineno(1), p.lexpos(1));
+        if (isinstance(p[4], Expresion) == True):
+            p[0] = Declaracion(True, p[3], None, p[4], p.lineno(1), p.lexpos(1));
+        else:
+            p[0] = Arreglo(True, p[3], None, p[4], p.lineno(1), p.lexpos(1))
     elif (len(p) == 6):
-        p[0] = Declaracion(False, p[2], p[4], p[5], p.lineno(1), p.lexpos(1));
+        if (isinstance(p[5], Expresion) == True):
+            p[0] = Declaracion(False, p[2], p[4], p[5], p.lineno(1), p.lexpos(1));
+        else:
+            p[0] = Arreglo(False, p[2], p[4], p[5], p.lineno(1), p.lexpos(1))
     else:
-        p[0] = Declaracion(False, p[2], None, p[3], p.lineno(1), p.lexpos(1));
+        if (isinstance(p[3], Expresion) == True):
+            p[0] = Declaracion(False, p[2], None, p[3], p.lineno(1), p.lexpos(1));
+        else:
+            p[0] = Arreglo(False, p[2], None, p[3], p.lineno(1), p.lexpos(1))
+
+def p_declaracion_tipo(p):
+    """
+    declaracion_tipo : type
+        | type_arreglo
+    """
+    p[0] = p[1];
 
 def p_type(p):
     """
@@ -104,14 +126,51 @@ def p_type(p):
     """
     if (len(p) == 2):
         p[0] = p[1];
-    else:
+    elif (len(p) == 3):
         p[0] = p[2];
+
+def p_type_arreglo(p):
+    """
+    type_arreglo : CORCHETE_ABRE type_arreglo PUNTO_COMA ENTERO CORCHETE_CIERRA
+        | type 
+    """
+    if (len(p) == 2):
+        p[0] = Dimension(p[1], []);
+    else:
+        p[2].dimensiones.append(p[4]); p[0] = p[2];
 
 def p_igualacion(p):
     """
     igualacion : IGUALACION expresion
+        | IGUALACION CORCHETE_ABRE lista_arreglo CORCHETE_CIERRA
     """
-    p[0] = p[2];
+    if (len(p) == 3):
+        p[0] = p[2];
+    else:
+        p[0] = p[3];
+
+def p_lista_arreglo(p):
+    """
+    lista_arreglo : lista_arreglo COMA CORCHETE_ABRE lista_arreglo CORCHETE_CIERRA
+        | CORCHETE_ABRE lista_arreglo CORCHETE_CIERRA
+        | expresiones_arreglo   
+    """
+    if (len(p) == 6):
+        p[1].append(p[4]); p[0] = p[1];
+    elif (len(p) == 4):
+        p[0] = [p[2]];
+    else:
+        p[0] = p[1];
+
+def p_expresiones_arreglo(p):
+    """
+    expresiones_arreglo : expresiones
+        | expresion PUNTO_COMA ENTERO
+    """
+    if (len(p) == 2):
+        p[0] = p[1];
+    else:
+        p[0] = Dimension(p[1], [p[3]]);
 
 # unidad aritmética
 def p_expresion_aritmetica(p):
@@ -215,8 +274,22 @@ def p_expresion_terminales(p):
 def p_expresion_identificador(p):
     """
     expresion : IDENTIFICADOR
+        | IDENTIFICADOR indice_arreglo
     """
-    p[0] = Acceso(p[1], p.lineno(1), p.lexpos(1))
+    if (len(p) == 2):
+        p[0] = Acceso(p[1], p.lineno(1), p.lexpos(1));
+    else:
+        p[0] = AccesoArreglo(p[1], p[2], p.lineno(1), p.lexpos(1));
+
+def p_indice_arreglo(p):
+    """
+    indice_arreglo : indice_arreglo CORCHETE_ABRE expresion CORCHETE_CIERRA
+    | CORCHETE_ABRE expresion CORCHETE_CIERRA
+    """
+    if (len(p) == 5):
+        p[1].append(p[3]); p[0] = p[1];
+    else:
+        p[0] = [p[2]];
 
 def p_expresion_inst(p):
     """
@@ -240,7 +313,6 @@ def p_expresion_nativas(p):
         p[0] = ToString(p[1], p.lineno(1), p.lexpos(1));
     elif(p[3] == TipoNativo.CLONE):
         p[0] = Clone(p[1], p.lineno(1), p.lexpos(1));
-    
 
 def p_funcion_nativa(p):
     """
@@ -263,6 +335,16 @@ def p_funcion_nativa(p):
         p[0] = TipoNativo.TO_OWNED;
     elif (p[1] == 'chars'):
         p[0] = TipoNativo.CHARS;
+
+def p_expresion_varios(p):
+    """
+    expresion : PARENTESIS_ABRE expresion PARENTESIS_CIERRA
+        | expresion AS type
+    """
+    if (p[1] == '(' and p[3] == ')'):
+        p[0] = p[2];
+    else:
+        p[0] = Casteo(p[1], p[3], p.lineno(1), p.lexpos(1));
 
 # impresión en consola (println)
 def p_imprimir(p):

@@ -13,7 +13,10 @@ class Imprimir(Instruccion):
             nuevaCadena:str = "";
             for expresion in self.expresiones:
                 val = expresion.ejecutar(console, scope)
-                nuevaCadena = self.cadena.replace("{}", str(val.valor), 1);
+                if (isinstance(val.valor, list) == True):
+                    nuevaCadena = self.cadena.replace("{:?}", str(val.valor), 1);
+                else:
+                    nuevaCadena = self.cadena.replace("{}", str(val.valor), 1);
             console.append(nuevaCadena + '\n');
         else:
             console.append(self.cadena + '\n');
