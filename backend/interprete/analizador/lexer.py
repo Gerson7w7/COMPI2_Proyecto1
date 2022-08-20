@@ -19,6 +19,7 @@ reservadas = {
     'str': 'STR',
     'usize': 'USIZE', 
     'vec': 'VEC',
+    'Vec': 'VEC_OBJ',
     'struct': 'STRUCT',
     'powf': 'POTENCIA_f64',
     'pow': 'POTENCIA_i64',

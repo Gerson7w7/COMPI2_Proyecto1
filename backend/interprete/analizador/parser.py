@@ -90,28 +90,37 @@ def p_declaracion(p):
     if (len(p) == 7):
         if (isinstance(p[6], Expresion) == True):
             p[0] = Declaracion(True, p[3], p[5], p[6], p.lineno(1), p.lexpos(1));
-        else:
-            p[0] = Arreglo(True, p[3], p[5], p[6], p.lineno(1), p.lexpos(1))
+        elif(isinstance(p[6], tuple) == True):
+            p[0] = Arreglo(True, p[3], p[5], list(p[6]), False, p.lineno(1), p.lexpos(1));
+        elif(isinstance(p[6], list) == True):
+            p[0] = Arreglo(True, p[3], p[5], p[6], True, p.lineno(1), p.lexpos(1));
     elif (len(p) == 5):
         if (isinstance(p[4], Expresion) == True):
             p[0] = Declaracion(True, p[3], None, p[4], p.lineno(1), p.lexpos(1));
-        else:
-            p[0] = Arreglo(True, p[3], None, p[4], p.lineno(1), p.lexpos(1))
+        elif(isinstance(p[4], tuple) == True):
+            p[0] = Arreglo(True, p[3], None, list(p[4]), False, p.lineno(1), p.lexpos(1));
+        elif(isinstance(p[4], list) == True):
+            p[0] = Arreglo(True, p[3], None, p[4], True, p.lineno(1), p.lexpos(1));
     elif (len(p) == 6):
         if (isinstance(p[5], Expresion) == True):
             p[0] = Declaracion(False, p[2], p[4], p[5], p.lineno(1), p.lexpos(1));
-        else:
-            p[0] = Arreglo(False, p[2], p[4], p[5], p.lineno(1), p.lexpos(1))
+        elif(isinstance(p[5], tuple) == True):
+            p[0] = Arreglo(False, p[2], p[4], list(p[5]), False, p.lineno(1), p.lexpos(1));
+        elif(isinstance(p[5], list) == True):
+            p[0] = Arreglo(False, p[2], p[4], p[5], True, p.lineno(1), p.lexpos(1));
     else:
         if (isinstance(p[3], Expresion) == True):
             p[0] = Declaracion(False, p[2], None, p[3], p.lineno(1), p.lexpos(1));
-        else:
-            p[0] = Arreglo(False, p[2], None, p[3], p.lineno(1), p.lexpos(1))
+        elif(isinstance(p[3], tuple) == True):
+            p[0] = Arreglo(False, p[2], None, list(p[3]), False, p.lineno(1), p.lexpos(1))
+        elif(isinstance(p[3], list) == True):
+            p[0] = Arreglo(False, p[2], None, p[3], True, p.lineno(1), p.lexpos(1))
 
 def p_declaracion_tipo(p):
     """
     declaracion_tipo : type
         | type_arreglo
+        | type_vector
     """
     p[0] = p[1];
 
@@ -139,15 +148,30 @@ def p_type_arreglo(p):
     else:
         p[2].dimensiones.append(p[4]); p[0] = p[2];
 
+def p_type_vector(p):
+    """
+    type_vector : VEC_OBJ MENOR type MAYOR
+    """
+    p[0] = p[3];
+
 def p_igualacion(p):
     """
     igualacion : IGUALACION expresion
         | IGUALACION CORCHETE_ABRE lista_arreglo CORCHETE_CIERRA
+        | IGUALACION declaracion_vector
     """
     if (len(p) == 3):
+        # expresion o vector
         p[0] = p[2];
     else:
-        p[0] = p[3];
+        # arreglo
+        p[0] = tuple(p[3]);
+
+def p_declaracion_vector(p):
+    """
+    declaracion_vector : VEC NOT CORCHETE_ABRE lista_vector CORCHETE_CIERRA
+    """
+    p[0] = p[4];
 
 def p_lista_arreglo(p):
     """
@@ -159,6 +183,19 @@ def p_lista_arreglo(p):
         p[1].append(p[4]); p[0] = p[1];
     elif (len(p) == 4):
         p[0] = [p[2]];
+    else:
+        p[0] = p[1];
+
+def p_lista_vector(p):
+    """
+    lista_vector : lista_vector COMA VEC NOT CORCHETE_ABRE lista_vector CORCHETE_CIERRA
+        | VEC NOT CORCHETE_ABRE lista_vector CORCHETE_CIERRA
+        | expresiones_arreglo   
+    """
+    if (len(p) == 8):
+        p[1].append(p[6]); p[0] = p[1];
+    elif (len(p) == 6):
+        p[0] = [p[4]];
     else:
         p[0] = p[1];
 

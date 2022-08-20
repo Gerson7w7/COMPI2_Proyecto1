@@ -1,3 +1,4 @@
+from backend.interprete.instrucciones.Instruccion import Instruccion
 from ..expresiones.Expresion import Expresion
 from ..extra.Scope import Scope
 from ..extra.Console import Console
@@ -9,12 +10,13 @@ class Dimension:
         self.dimensiones = dimensiones;
 
 class Arreglo(Expresion):
-    def __init__(self, mut:bool, id:str, dimension:Dimension, valor, linea:int, columna:int):
+    def __init__(self, mut:bool, id:str, dimension:Dimension, valor, esVector:bool, linea:int, columna:int):
         super().__init__(linea, columna);
         self.mut = mut;
         self.id = id;
         self.dimension = dimension;
         self.valor = valor;
+        self.esVector = esVector;
 
     def ejecutar(self, console: Console, scope: Scope):
         # primero miramos de que tipo de dato será el arreglo
@@ -43,12 +45,7 @@ class Arreglo(Expresion):
         # indice del arreglo con las dimensiones
         iAux:int = -1 if (len(_dimensiones) == 0) else len(_dimensiones) - 1;
         listaResultante = self.nuevaDimension(self.valor, console, scope, _tipo, _dimensiones, iAux);
-        scope.crearVariable(self.id, listaResultante, _tipo, self.mut, self.linea, self.columna);
-        # print("tipo:: " + str(self.tipo));
-        # print("dimensiones_aux:: " + str(_dimensiones));
-        print("lista:: " + str(listaResultante));
-        print("valor esperado:: " + str(listaResultante[0][1][3]));
-        print("============================")
+        scope.crearVariable(self.id, listaResultante, _tipo, self.mut, self.esVector, self.linea, self.columna);
 
     def nuevaDimension(self, valor, console: Console, scope: Scope, _tipo:TipoDato, dimensionesAux:list, iAux:int):
         # verificamos que se trate de una lista, sino es una expresion
@@ -92,3 +89,24 @@ class Arreglo(Expresion):
                     return listaAux;
                 # ERROR. se esperaba un arreglo de {dimensionesAux[iAux]} elemenots y se encontró {cont} elementos.
             return listaAux;
+
+
+class AsignacionArreglo(Instruccion):
+    def __init__(self, id:str, indices:list, expresion, linea: int, columna: int):
+        super().__init__(linea, columna);
+        self.id = id;
+        self.indices = indices;
+        self.expresion = expresion;
+
+    def ejecutar(self, console: Console, scope: Scope):
+        # obtenemos el valor de la expresion
+        val = self.expresion.ejecutar(console, scope);
+        # indice
+        indice:list = [];
+        for i in self.indices:
+            index = i.ejecutar(console, scope);
+            if (index.tipo != TipoDato.INT64):
+                # ERROR. No sepuede acceder a la posición index.valor
+                pass;
+            indice.append(index.valor);
+        
