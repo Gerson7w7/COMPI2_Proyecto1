@@ -1,22 +1,30 @@
-from backend.interprete.instrucciones.Instruccion import Instruccion
+from ..instrucciones.Instruccion import Instruccion
 from ..expresiones.Expresion import Expresion
 from ..extra.Scope import Scope
 from ..extra.Console import Console
 from ..extra.Tipos import TipoDato
 
 class Dimension:
-    def __init__(self, tipo:str, dimensiones:list):
+    def __init__(self, tipo:str, dimensiones:list, esVector:bool):
         self.tipo = tipo;
         self.dimensiones = dimensiones;
+        self.esVector = esVector;
 
-class Arreglo(Expresion):
-    def __init__(self, mut:bool, id:str, dimension:Dimension, valor, esVector:bool, linea:int, columna:int):
+class WithCapacity:
+    def __init__(self, esVector:bool, capacidad:int):
+        self.esVector = esVector;
+        self.capacidad = capacidad;
+
+class Arreglo(Instruccion):
+    def __init__(self, mut:bool, id:str, dimension:Dimension, valor, esVector:bool, with_capacity:int, linea:int, columna:int):
         super().__init__(linea, columna);
         self.mut = mut;
         self.id = id;
         self.dimension = dimension;
-        self.valor = valor;
+        self.valor = valor if(isinstance(valor, list) or isinstance(valor, Dimension)) else list(valor);
         self.esVector = esVector;
+        self.with_capacity = with_capacity;
+        self.tipo = None;
 
     def ejecutar(self, console: Console, scope: Scope):
         # primero miramos de que tipo de dato será el arreglo
@@ -45,7 +53,9 @@ class Arreglo(Expresion):
         # indice del arreglo con las dimensiones
         iAux:int = -1 if (len(_dimensiones) == 0) else len(_dimensiones) - 1;
         listaResultante = self.nuevaDimension(self.valor, console, scope, _tipo, _dimensiones, iAux);
-        scope.crearVariable(self.id, listaResultante, _tipo, self.mut, self.esVector, self.linea, self.columna);
+        # esto nos ayudará para saber que tipo de dato es en la asignación
+        scope.crearVariable(self.id, listaResultante, self.tipo, self.mut, self.esVector, self.with_capacity, self.linea, self.columna);
+        print("listaaaa::"+str(listaResultante));
 
     def nuevaDimension(self, valor, console: Console, scope: Scope, _tipo:TipoDato, dimensionesAux:list, iAux:int):
         # verificamos que se trate de una lista, sino es una expresion
@@ -67,9 +77,8 @@ class Arreglo(Expresion):
             # cuando sea expresion
             val = valor.ejecutar(console, scope);
             # verificamos el tipo si coincide con el arreglo
-            _tipo = val.tipo if (_tipo == None) else _tipo;
-            self.tipo = _tipo;
-            if (val.tipo == _tipo):
+            self.tipo = val.tipo if (_tipo == None) else _tipo;
+            if (val.tipo == self.tipo):
                 return val.valor;
             # ERROR. tipos incopatibles
         elif (isinstance(valor, Dimension) == True):
@@ -77,9 +86,8 @@ class Arreglo(Expresion):
             for i in range(valor.dimensiones[0]):
                 # aki ejecutaremos n veces la misma expresion para llenar el arreglo
                 val = valor.tipo.ejecutar(console, scope);
-                _tipo = val.tipo if (_tipo == None) else _tipo;
-                self.tipo = _tipo;
-                if (val.tipo != _tipo):
+                self.tipo = val.tipo if (_tipo == None) else _tipo;
+                if (val.tipo != self.tipo):
                     # ERROR. tipos incopatibles
                     pass;
                 listaAux.append(val.valor);
@@ -96,11 +104,15 @@ class AsignacionArreglo(Instruccion):
         super().__init__(linea, columna);
         self.id = id;
         self.indices = indices;
-        self.expresion = expresion;
+        self.expresion = expresion if(isinstance(expresion, Expresion) or isinstance(expresion, Dimension)) else list(expresion);
 
     def ejecutar(self, console: Console, scope: Scope):
         # obtenemos el valor de la expresion
-        val = self.expresion.ejecutar(console, scope);
+        if (isinstance(self.expresion, Expresion)):
+            val = self.expresion.ejecutar(console, scope);
+        else:
+            arr = Arreglo(None, None, None, [], None, None, None);
+            listaResultante:list = arr.nuevaDimension(self.expresion, console, scope, arr.tipo, [], -1);
         # indice
         indice:list = [];
         for i in self.indices:
@@ -109,4 +121,7 @@ class AsignacionArreglo(Instruccion):
                 # ERROR. No sepuede acceder a la posición index.valor
                 pass;
             indice.append(index.valor);
-        
+        if (isinstance(self.expresion, Expresion)):    
+            scope.setValorArreglo(self.id, val.valor, val.tipo, indice, self.linea, self.columna);
+        else:
+            scope.setValorArreglo(self.id, listaResultante, arr.tipo, indice, self.linea, self.columna);

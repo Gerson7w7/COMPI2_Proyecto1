@@ -35,7 +35,7 @@ class Declaracion(Instruccion):
             _tipo = val.tipo if (_tipo == None) else _tipo;
             # asegurandonos de que sea el mismo tipo de dato para crear la variable
             if (val.tipo == _tipo):
-                scope.crearVariable(self.id, val.valor, val.tipo, self.mut, self.linea, self.columna);
+                scope.crearVariable(self.id, val.valor, val.tipo, self.mut, None, self.linea, self.columna);
             else:
                 # error, diferentes tipos de datos
                 print("error::: " + self.id)

@@ -11,7 +11,7 @@ class Scope:
         self.funciones = {};
     
     # función para crear una variable
-    def crearVariable(self, id: str, valor, tipo: TipoDato, mut:bool, esVector:bool, linea: int, columna: int):
+    def crearVariable(self, id: str, valor, tipo: TipoDato, mut:bool, esVector:bool, with_capacity:int, linea: int, columna: int):
         scope: Scope = self;
 
         while(scope != None):
@@ -21,7 +21,7 @@ class Scope:
                 # ERROR: la variable ya ha sido declarada
             scope = scope.padre;
         # procedemos a crear la variable
-        self.variables[id] = Simbolo(valor, id, tipo, mut, esVector);
+        self.variables[id] = Simbolo(valor, id, tipo, mut, esVector, with_capacity);
         # lo guardamos en la tabla de simbolos
         self.simbolos.append(TablaSimbolo(id, 'variable', str(tipo), '', linea, columna))
 
@@ -57,18 +57,27 @@ class Scope:
                     pass;
             scope = scope.padre;
     
-    def setValorArreglo(self, id:str, valor, indices:list, linea:int, columna:int):
+    def setValorArreglo(self, id:str, valor, tipo, indices:list, linea:int, columna:int):
         scope: Scope = self;
         while(scope != None):
-            val:Simbolo = scope.variables.get(id);
-            if (val.tipo == valor.tipo):
-                val.valor = self.recorrerLista(valor, val.valor[indices[0]], indices, 1);
+            if (scope.variables.get(id) != None):
+                val:Simbolo = scope.variables.get(id);
+                if (val.tipo != tipo):
+                    # ERROR. Tipos imcompatible, un arreglo de tipo ... no puede contener una expresión de tipo ...
+                    pass;
+                val.valor = self.recorrerLista(valor, val.valor, indices, 0);
+                scope.variables.update({id: val});
+            scope = scope.padre;
 
     def recorrerLista(self, valor, lista, indices:list, iAux):
         # verificamos que aun se ana lista
         if (iAux < len(indices)):
-            lista[indices[iAux]] = self.recorrerLista(valor, lista[indices[iAux]], indices, iAux + 1);
-            return lista;
+            try:
+                lista[indices[iAux]] = self.recorrerLista(valor, lista[indices[iAux]], indices, iAux + 1);
+                return lista;
+            except:
+                # ERROR. Indice fuera de rango
+                print("INDICE FUERA DE RANGO")
         else:
             # llegado a este punto es la expresion a cambiar
             return valor;

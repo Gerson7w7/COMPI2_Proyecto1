@@ -13,10 +13,11 @@ class Casteo(Expresion):
     def ejecutar(self, console: Console, scope: Scope):
         # recuperamos la expresion
         val = self.expresion.ejecutar(console, scope);
-
         if (self.tipo == 'i64'):
+            print("int: " +str(int(val.valor)))
             return RetornoExpresion(int(val.valor), TipoDato.INT64, None);
         elif (self.tipo == 'f64'):
+            print("float: " +str(float(val.valor)))
             return RetornoExpresion(float(val.valor), TipoDato.FLOAT64, None);
         elif (self.tipo == 'bool'):
             try:

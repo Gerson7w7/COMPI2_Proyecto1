@@ -20,8 +20,9 @@ from ..instrucciones.Loop import Loop
 from ..expresiones.FuncionesNativas import Abs, Clone, Sqrt, ToString
 from ..instrucciones.While import While
 from ..expresiones.Casteo import Casteo
-from ..instrucciones.Arreglo import Dimension, Arreglo
+from ..instrucciones.Arreglo import AsignacionArreglo, Dimension, Arreglo, WithCapacity
 from ..expresiones.Expresion import Expresion
+from interprete.instrucciones.FuncionesVector import Push
 
 tokens = lexer.tokens;
 
@@ -29,6 +30,7 @@ tokens = lexer.tokens;
 precedence = (
     ('left', 'RESTA', 'SUMA'),
     ('left', 'MULTIPLICACION', 'DIVISION', 'MODULO'),
+    ('left', 'AS'),
     ('right', 'UMENOS'),
 )
 
@@ -60,6 +62,7 @@ def p_instruccion(p):
         | expresion
         | loop
         | while
+        | funciones_vector PUNTO_COMA
         | BREAK retorno PUNTO_COMA
         | CONTINUE PUNTO_COMA
         | RETURN retorno PUNTO_COMA
@@ -90,31 +93,47 @@ def p_declaracion(p):
     if (len(p) == 7):
         if (isinstance(p[6], Expresion) == True):
             p[0] = Declaracion(True, p[3], p[5], p[6], p.lineno(1), p.lexpos(1));
-        elif(isinstance(p[6], tuple) == True):
-            p[0] = Arreglo(True, p[3], p[5], list(p[6]), False, p.lineno(1), p.lexpos(1));
-        elif(isinstance(p[6], list) == True):
-            p[0] = Arreglo(True, p[3], p[5], p[6], True, p.lineno(1), p.lexpos(1));
+        elif(isinstance(p[6], tuple) == True or (isinstance(p[6], Dimension) and p[6].esVector == False)):
+            p[0] = Arreglo(True, p[3], p[5], p[6], False, None, p.lineno(1), p.lexpos(1));
+        elif(isinstance(p[6], list) == True or (isinstance(p[6], Dimension) and p[6].esVector == True)):
+            p[0] = Arreglo(True, p[3], p[5], p[6], True, None, p.lineno(1), p.lexpos(1));
+        elif(p[6] == 'new'):
+            p[0] = Arreglo(True, p[3], p[5], [], True, None, p.lineno(1), p.lexpos(1));
+        elif(isinstance(p[6], WithCapacity)):
+            p[0] = Arreglo(True, p[3], p[5], [], True, p[6].capacidad, p.lineno(1), p.lexpos(1));
     elif (len(p) == 5):
         if (isinstance(p[4], Expresion) == True):
             p[0] = Declaracion(True, p[3], None, p[4], p.lineno(1), p.lexpos(1));
-        elif(isinstance(p[4], tuple) == True):
-            p[0] = Arreglo(True, p[3], None, list(p[4]), False, p.lineno(1), p.lexpos(1));
-        elif(isinstance(p[4], list) == True):
-            p[0] = Arreglo(True, p[3], None, p[4], True, p.lineno(1), p.lexpos(1));
+        elif(isinstance(p[4], tuple) == True or (isinstance(p[4], Dimension) and p[4].esVector == False)):
+            p[0] = Arreglo(True, p[3], None, p[4], False, None, p.lineno(1), p.lexpos(1));
+        elif(isinstance(p[4], list) == True or (isinstance(p[4], Dimension) and p[4].esVector == True)):
+            p[0] = Arreglo(True, p[3], None, p[4], True, None, p.lineno(1), p.lexpos(1));
+        elif(p[4] == 'new'):
+            p[0] = Arreglo(True, p[3], None, [], True, None, p.lineno(1), p.lexpos(1));
+        elif(isinstance(p[4], WithCapacity)):
+            p[0] = Arreglo(True, p[3], None, [], True, p[4].capacidad, p.lineno(1), p.lexpos(1));
     elif (len(p) == 6):
         if (isinstance(p[5], Expresion) == True):
             p[0] = Declaracion(False, p[2], p[4], p[5], p.lineno(1), p.lexpos(1));
-        elif(isinstance(p[5], tuple) == True):
-            p[0] = Arreglo(False, p[2], p[4], list(p[5]), False, p.lineno(1), p.lexpos(1));
-        elif(isinstance(p[5], list) == True):
-            p[0] = Arreglo(False, p[2], p[4], p[5], True, p.lineno(1), p.lexpos(1));
+        elif(isinstance(p[5], tuple) == True or (isinstance(p[5], Dimension) and p[5].esVector == False)):
+            p[0] = Arreglo(False, p[2], p[4], p[5], False, None, p.lineno(1), p.lexpos(1));
+        elif(isinstance(p[5], list) == True or (isinstance(p[5], Dimension) and p[5].esVector == True)):
+            p[0] = Arreglo(False, p[2], p[4], p[5], True, None, p.lineno(1), p.lexpos(1));
+        elif(p[5] == 'new'):
+            p[0] = Arreglo(False, p[2], p[4], [], True, None, p.lineno(1), p.lexpos(1));
+        elif(isinstance(p[5], WithCapacity)):
+            p[0] = Arreglo(False, p[2], p[4], [], True, p[5].capacidad, p.lineno(1), p.lexpos(1));
     else:
         if (isinstance(p[3], Expresion) == True):
             p[0] = Declaracion(False, p[2], None, p[3], p.lineno(1), p.lexpos(1));
-        elif(isinstance(p[3], tuple) == True):
-            p[0] = Arreglo(False, p[2], None, list(p[3]), False, p.lineno(1), p.lexpos(1))
-        elif(isinstance(p[3], list) == True):
-            p[0] = Arreglo(False, p[2], None, p[3], True, p.lineno(1), p.lexpos(1))
+        elif(isinstance(p[3], tuple) == True or (isinstance(p[3], Dimension) and p[3].esVector == False)):
+            p[0] = Arreglo(False, p[2], None, p[3], False, None, p.lineno(1), p.lexpos(1));
+        elif(isinstance(p[3], list) == True or (isinstance(p[3], Dimension) and p[3].esVector == True)):
+            p[0] = Arreglo(False, p[2], None, p[3], True, None, p.lineno(1), p.lexpos(1));
+        elif(p[3] == 'new'):
+            p[0] = Arreglo(False, p[2], None, [], True, None, p.lineno(1), p.lexpos(1));
+        elif(isinstance(p[3], WithCapacity)):
+            p[0] = Arreglo(False, p[2], None, [], True, p[3].capacidad, p.lineno(1), p.lexpos(1));
 
 def p_declaracion_tipo(p):
     """
@@ -144,7 +163,7 @@ def p_type_arreglo(p):
         | type 
     """
     if (len(p) == 2):
-        p[0] = Dimension(p[1], []);
+        p[0] = Dimension(p[1], [], False);
     else:
         p[2].dimensiones.append(p[4]); p[0] = p[2];
 
@@ -152,7 +171,7 @@ def p_type_vector(p):
     """
     type_vector : VEC_OBJ MENOR type MAYOR
     """
-    p[0] = p[3];
+    p[0] = Dimension(p[3], [], True);
 
 def p_igualacion(p):
     """
@@ -165,13 +184,23 @@ def p_igualacion(p):
         p[0] = p[2];
     else:
         # arreglo
-        p[0] = tuple(p[3]);
+        if (isinstance(p[3], list) == True):
+            p[0] = tuple(p[3]);
+        else:
+            p[0] = p[3];
 
 def p_declaracion_vector(p):
     """
     declaracion_vector : VEC NOT CORCHETE_ABRE lista_vector CORCHETE_CIERRA
+        | VEC_OBJ DOS_PUNTOS DOS_PUNTOS NEW PARENTESIS_ABRE PARENTESIS_CIERRA
+        | VEC_OBJ DOS_PUNTOS DOS_PUNTOS WITH_CAPACITY PARENTESIS_ABRE expresion PARENTESIS_CIERRA
     """
-    p[0] = p[4];
+    if (len(p) == 8):
+        p[0] = WithCapacity(True, p[6]);
+    else:
+        if (isinstance(p[4], Dimension)):
+            p[4].esVector = True;
+        p[0] = p[4];
 
 def p_lista_arreglo(p):
     """
@@ -207,7 +236,7 @@ def p_expresiones_arreglo(p):
     if (len(p) == 2):
         p[0] = p[1];
     else:
-        p[0] = Dimension(p[1], [p[3]]);
+        p[0] = Dimension(p[1], [p[3]], False);
 
 # unidad aritmética
 def p_expresion_aritmetica(p):
@@ -408,8 +437,12 @@ def p_expresiones(p):
 def p_asignacion(p):
     """
     asignacion : IDENTIFICADOR igualacion
+        | IDENTIFICADOR indice_arreglo igualacion
     """
-    p[0] = Asignacion(p[1], p[2], p.lineno(1), p.lexpos(1))
+    if (len(p) == 3):
+        p[0] = Asignacion(p[1], p[2], p.lineno(1), p.lexpos(1));
+    else:
+        p[0] = AsignacionArreglo(p[1], p[2], p[3], p.lineno(1), p.lexpos(1));
 
 def p_if(p):
     """
@@ -489,6 +522,13 @@ def p_while(p):
     while : WHILE expresion bloque
     """
     p[0] = While(p[2], p[3], p.lineno(1), p.lexpos(1));
+
+def p_funciones_vector(p):
+    """
+    funciones_vector : IDENTIFICADOR PUNTO PUSH PARENTESIS_ABRE expresion PARENTESIS_CIERRA
+    """
+    if (p[3] == 'push'):
+        p[0] = Push(p[1], p[5], p.lineno(1), p.lexpos(1));
 
 def p_empty(p):
     """

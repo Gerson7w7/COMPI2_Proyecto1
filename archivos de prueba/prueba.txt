@@ -137,18 +137,27 @@ println!("suma: {}", suma);
 // ============= ARREGLOS =============
 let arr1: [&str; 2] = ["Hola", "Mundo"];
 println!("arr1: {:?}", arr1); 
+arr1[0] = "Adios";
+println!("arr1: {:?}", arr1); 
 
 let arr2: [String; 3] = ["El".to_string(), "Bicho".to_string(), "Siuuuu".to_string()];
 println!("arr2: {:?}", arr2);
+arr2[2] = "ooooaaaa".to_owned();
+println!("arr2: {:?}", arr2); 
 
 let mut arr3: [[[i64; 4];2]; 2] = [
 [ [ 1, 3, 5, 7], [ 9, 11, 13, 15] ],
 [ [ 2, 4, 6, 8], [10, 12, 14, 16] ]
 ];
 println!("arr3: {:?}", arr3);
+println!("arr3: {:?}", arr3);
+arr3[1][0][3] = 1000;
+println!("arr3: {:?}", arr3);
 
 // ============= OTRA FORMA DE DECLARAR ARREGLOS =============
 let arr4: [&str; 4] = ["Hola"; 4]; // ["Hola", "Hola", "Hola", "Hola"]
+println!("arr4: {:?}", arr4);
+arr4[2] = "SIUUU";
 println!("arr4: {:?}", arr4);
 
 let mut arr5 = [
@@ -159,3 +168,27 @@ let mut arr5 = [
 println!("arr5: {:?}", arr5); // imprime toda la lista
 println!("pos[0][1]: {:?}", arr5[0][1]); // imprime 5,5,5,5
 println!("pos[1][0][0]: {}", arr5[1][0][0]); // imprime 2
+//arr5[0][1] = [-1;4];
+arr5[0][1] = [1,1,1,1];
+println!("arr5: {:?}", arr5); // imprime toda la lista
+
+println!("EXPRESSION: {}", 2 as f64 as i64 as f64 as i64 - 5.0 as i64); 
+
+// ============ VECTOR ===============
+let mut vector = vec![1,2,3,4,5];
+println!("vector => {:?}", vector);
+vector[4] = 10;
+println!("vector => {:?}", vector);
+
+let vector2 = vec![vec![vec![1,1,1],vec![2,2,2]],vec![2; 8],vec![3; 15],vec![5; 2],vec![8; 1]];
+println!("vector2 => {:?}", vector2);
+vector2[3][0] = 10;
+vector2[0][1][1] = -5;
+vector2[0][0] = vec![-30;3];
+println!("vector2 => {:?}", vector2);
+
+let vector3: Vec<&str> = Vec::new();
+println!("vector3 => {:?}", vector3);
+
+let vector4: Vec<&str> = Vec::with_capacity(3);
+println!("vector4 => {:?}", vector4);
