@@ -17,28 +17,114 @@ from interprete.instrucciones.IfElse import IfElse
 from interprete.instrucciones.Match import Case, Match
 from ..instrucciones.Transferencia import Transferencia
 from ..instrucciones.Loop import Loop
-from ..expresiones.FuncionesNativas import Abs, Clone, Sqrt, ToString
+from ..expresiones.FuncionesNativas import Abs, Clone, Sqrt, ToString, Chars
 from ..instrucciones.While import While
 from ..expresiones.Casteo import Casteo
 from ..instrucciones.Arreglo import AsignacionArreglo, Dimension, Arreglo, WithCapacity
 from ..expresiones.Expresion import Expresion
-from interprete.instrucciones.FuncionesVector import Push
+from interprete.instrucciones.FuncionesVector import Push, Insert, Remove, Contains, Longitud, Capacity
+from interprete.instrucciones.Instruccion import Instruccion
+from ..instrucciones.ForIn import ForIn
+from ..instrucciones.Funcion import Funcion
+from ..instrucciones.LlamadaFuncion import LlamadaFuncion
 
 tokens = lexer.tokens;
 
 # precedencia de operadores
 precedence = (
+    ('left', 'OR'),
+    ('left', 'AND'),
+    ('left', 'MENOR', 'MAYOR', 'MENOR_IGUAL', 'MAYOR_IGUAL', 'DESIGUALDAD', 'IGUALDAD'),
     ('left', 'RESTA', 'SUMA'),
-    ('left', 'MULTIPLICACION', 'DIVISION', 'MODULO'),
+    ('left', 'MODULO'),
+    ('left', 'MULTIPLICACION', 'DIVISION'),
     ('left', 'AS'),
+    ('right', 'NOT'),
     ('right', 'UMENOS'),
 )
 
 def p_inicio(p):
     """
-    inicio : instrucciones
+    inicio : ejecutables
     """
     p[0] = Ast(p[1])
+
+def p_ejecutables(p):
+    """
+    ejecutables : ejecutables ejecutable
+        | ejecutable
+    """
+    if (len(p) == 3):
+        p[1].append(p[2]); p[0] = p[1];
+    else:
+        p[0] = [p[1]];
+
+def p_ejecutable(p):
+    """
+    ejecutable : funcion
+        | struct
+    """
+    p[0] = p[1];
+
+def p_funcion(p):
+    """
+    funcion : FN IDENTIFICADOR PARENTESIS_ABRE parametros PARENTESIS_CIERRA retorno_fn bloque
+    """
+    p[0] = Funcion(p[2], p[4], p[6], p[7], p.lineno(1), p.lexpos(1));
+
+def p_struct(p):
+    """
+    struct : STRUCT IDENTIFICADOR bloque_struct
+    """
+
+def p_bloque_struct(p):
+    """
+    bloque_struct : CORCHETE_ABRE parametros CORCHETE_CIERRA
+    """
+    p[0] = p[2];
+
+def p_parametros(p):
+    """
+    parametros : parametros COMA parametro
+        | parametro
+    """
+    if (len(p) == 4):
+        p[1].append(p[3]); p[0] = p[1];
+    elif (p[1] == None):
+        p[0] = p[1];
+    else:
+        p[0] = [p[1]];
+
+def p_parametro(p):
+    """
+    parametro : IDENTIFICADOR DOS_PUNTOS referencia declaracion_tipo
+        | empty
+    """
+    if (len(p) == 2):
+        p[0] = p[1];
+    elif (isinstance(p[4], Dimension)):
+        if (len(p[4].dimensiones) == 0):
+            p[0] = Arreglo(True, p[1], p[4], [], True, None, p.lineno(1), p.lexpos(1));
+        else:
+            p[0] = Arreglo(True, p[1], p[4], [], False, None, p.lineno(1), p.lexpos(1));
+    else:
+        p[0] = Declaracion(True, p[1], p[4], None, p.lineno(1), p.lexpos(1));
+
+def p_referencia(p):
+    """
+    referencia : AMPERSON MUT
+        | empty
+    """
+
+def p_retorno_fn(p):
+    """
+    retorno_fn : FLECHA_GUION declaracion_tipo
+        | empty
+    """
+    if (len(p) == 2):
+        p[0] = p[1];
+    else:    
+        p[0] = p[2];
 
 # lista de instrucciones
 def p_instrucciones(p):
@@ -62,7 +148,9 @@ def p_instruccion(p):
         | expresion
         | loop
         | while
+        | for_in
         | funciones_vector PUNTO_COMA
+        | llamada_funcion PUNTO_COMA
         | BREAK retorno PUNTO_COMA
         | CONTINUE PUNTO_COMA
         | RETURN retorno PUNTO_COMA
@@ -91,7 +179,7 @@ def p_declaracion(p):
         | LET IDENTIFICADOR igualacion
     """
     if (len(p) == 7):
-        if (isinstance(p[6], Expresion) == True):
+        if (isinstance(p[6], Expresion) or isinstance(p[6], Instruccion)):
             p[0] = Declaracion(True, p[3], p[5], p[6], p.lineno(1), p.lexpos(1));
         elif(isinstance(p[6], tuple) == True or (isinstance(p[6], Dimension) and p[6].esVector == False)):
             p[0] = Arreglo(True, p[3], p[5], p[6], False, None, p.lineno(1), p.lexpos(1));
@@ -102,7 +190,7 @@ def p_declaracion(p):
         elif(isinstance(p[6], WithCapacity)):
             p[0] = Arreglo(True, p[3], p[5], [], True, p[6].capacidad, p.lineno(1), p.lexpos(1));
     elif (len(p) == 5):
-        if (isinstance(p[4], Expresion) == True):
+        if (isinstance(p[4], Expresion) or isinstance(p[4], Instruccion)):
             p[0] = Declaracion(True, p[3], None, p[4], p.lineno(1), p.lexpos(1));
         elif(isinstance(p[4], tuple) == True or (isinstance(p[4], Dimension) and p[4].esVector == False)):
             p[0] = Arreglo(True, p[3], None, p[4], False, None, p.lineno(1), p.lexpos(1));
@@ -113,7 +201,7 @@ def p_declaracion(p):
         elif(isinstance(p[4], WithCapacity)):
             p[0] = Arreglo(True, p[3], None, [], True, p[4].capacidad, p.lineno(1), p.lexpos(1));
     elif (len(p) == 6):
-        if (isinstance(p[5], Expresion) == True):
+        if (isinstance(p[5], Expresion) or isinstance(p[5], Instruccion)):
             p[0] = Declaracion(False, p[2], p[4], p[5], p.lineno(1), p.lexpos(1));
         elif(isinstance(p[5], tuple) == True or (isinstance(p[5], Dimension) and p[5].esVector == False)):
             p[0] = Arreglo(False, p[2], p[4], p[5], False, None, p.lineno(1), p.lexpos(1));
@@ -124,7 +212,7 @@ def p_declaracion(p):
         elif(isinstance(p[5], WithCapacity)):
             p[0] = Arreglo(False, p[2], p[4], [], True, p[5].capacidad, p.lineno(1), p.lexpos(1));
     else:
-        if (isinstance(p[3], Expresion) == True):
+        if (isinstance(p[3], Expresion) or isinstance(p[3], Instruccion)):
             p[0] = Declaracion(False, p[2], None, p[3], p.lineno(1), p.lexpos(1));
         elif(isinstance(p[3], tuple) == True or (isinstance(p[3], Dimension) and p[3].esVector == False)):
             p[0] = Arreglo(False, p[2], None, p[3], False, None, p.lineno(1), p.lexpos(1));
@@ -307,8 +395,10 @@ def p_expresion_logica(p):
     if (len(p) == 3):
         p[0] = Logico(p[2], None, TipoLogico.NOT, p.lineno(1), p.lexpos(1))
     elif (p[2] == '||'):
+        print(str(p[1]) + " || " + str(p[3]))
         p[0] = Logico(p[1], p[3], TipoLogico.OR, p.lineno(1), p.lexpos(1))
     elif (p[2] == '&&'):
+        print(str(p[1]) + " && " + str(p[3]))
         p[0] = Logico(p[1], p[3], TipoLogico.AND, p.lineno(1), p.lexpos(1))
 
 def p_expresion_terminales(p):
@@ -364,6 +454,8 @@ def p_expresion_inst(p):
         | imprimir
         | asignacion
         | loop
+        | funciones_vector
+        | llamada_funcion 
     """
     p[0] = p[1];
 
@@ -379,6 +471,8 @@ def p_expresion_nativas(p):
         p[0] = ToString(p[1], p.lineno(1), p.lexpos(1));
     elif(p[3] == TipoNativo.CLONE):
         p[0] = Clone(p[1], p.lineno(1), p.lexpos(1));
+    elif(p[3] == TipoNativo.CHARS):
+        p[0] = Chars(p[1], p.lineno(1), p.lexpos(1));
 
 def p_funcion_nativa(p):
     """
@@ -415,24 +509,44 @@ def p_expresion_varios(p):
 # impresión en consola (println)
 def p_imprimir(p):
     """
-    imprimir : PRINTLN NOT PARENTESIS_ABRE CADENA COMA expresiones PARENTESIS_CIERRA
-        | PRINTLN NOT PARENTESIS_ABRE CADENA PARENTESIS_CIERRA
+    imprimir : tipo_impresion NOT PARENTESIS_ABRE CADENA COMA expresiones PARENTESIS_CIERRA
+        | tipo_impresion NOT PARENTESIS_ABRE CADENA PARENTESIS_CIERRA
     """
     if (len(p) == 8):
-        p[0] = Imprimir(p[4], p[6], p.lineno(1), p.lexpos(1));
+        p[0] = Imprimir(p[1], p[4], p[6], p.lineno(1), p.lexpos(1));
     else:
-        p[0] = Imprimir(p[4], None, p.lineno(1), p.lexpos(1));
+        p[0] = Imprimir(p[1], p[4], None, p.lineno(1), p.lexpos(1));
+
+def p_tipo_impresion(p):
+    """
+    tipo_impresion : PRINTLN
+        | PRINT
+    """
+    if (p[1] == 'println'):
+        p[0] = True;
+    else:
+        p[0] = False;
 
 # expresiones para el println
 def p_expresiones(p):
     """
-    expresiones : expresiones COMA expresion
-        | expresion
+    expresiones : expresiones COMA tipo_expresion
+        | tipo_expresion
     """
     if (len(p) == 4):
         p[1].append(p[3]); p[0] = p[1];
     else:
         p[0] = [p[1]];  
+
+def p_tipo_expresion(p):
+    """
+    tipo_expresion : AMPERSON MUT expresion
+        | expresion
+    """
+    if (len(p) == 4):
+        p[0] = p[3];
+    else:
+        p[0] = p[1];
 
 def p_asignacion(p):
     """
@@ -523,12 +637,59 @@ def p_while(p):
     """
     p[0] = While(p[2], p[3], p.lineno(1), p.lexpos(1));
 
+def p_for_in(p):
+    """
+    for_in : FOR IDENTIFICADOR IN iterables bloque
+    """
+    p[0] = ForIn(p[2], p[4], p[5], p.lineno(1), p.lexpos(1));
+
+def p_iterables(p):
+    """
+    iterables : expresion PUNTO PUNTO expresion
+        | expresion
+        | CORCHETE_ABRE lista_arreglo CORCHETE_CIERRA
+    """
+    if (len(p) == 2):
+        p[0] = p[1];
+    elif (len(p) == 5):
+        lista = []; lista.append(p[1]); lista.append(p[4]); p[0] = lista;
+    else:
+        p[0] = p[2];
+
 def p_funciones_vector(p):
     """
-    funciones_vector : IDENTIFICADOR PUNTO PUSH PARENTESIS_ABRE expresion PARENTESIS_CIERRA
+    funciones_vector : expresion PUNTO PUSH PARENTESIS_ABRE expresion PARENTESIS_CIERRA
+        | expresion PUNTO INSERT PARENTESIS_ABRE expresion COMA expresion PARENTESIS_CIERRA
+        | expresion PUNTO REMOVE PARENTESIS_ABRE expresion PARENTESIS_CIERRA
+        | expresion PUNTO CONTAINS PARENTESIS_ABRE AMPERSON expresion PARENTESIS_CIERRA
+        | expresion PUNTO LEN PARENTESIS_ABRE PARENTESIS_CIERRA
+        | expresion PUNTO CAPACITY PARENTESIS_ABRE PARENTESIS_CIERRA
     """
     if (p[3] == 'push'):
         p[0] = Push(p[1], p[5], p.lineno(1), p.lexpos(1));
+    elif (p[3] == 'insert'):
+        p[0] = Insert(p[1], p[5], p[7], p.lineno(1), p.lexpos(1));
+    elif (p[3] == 'remove'):
+        p[0] = Remove(p[1], p[5], p.lineno(1), p.lexpos(1));
+    elif (p[3] == 'contains'):
+        p[0] = Contains(p[1], p[6], p.lineno(1), p.lexpos(1));
+    elif (p[3] == 'len'):
+        p[0] = Longitud(p[1], p.lineno(1), p.lexpos(1));
+    elif (p[3] == 'capacity'):
+        p[0] = Capacity(p[1], p.lineno(1), p.lexpos(1));
+
+def p_llamada_funcion(p):
+    """
+    llamada_funcion : IDENTIFICADOR PARENTESIS_ABRE argumentos PARENTESIS_CIERRA
+    """
+    p[0] = LlamadaFuncion(p[1], p[3], p.lineno(1), p.lexpos(1));
+
+def p_argumentos(p):
+    """
+    argumentos : expresiones
+        | empty
+    """
+    p[0] = p[1];
 
 def p_empty(p):
     """

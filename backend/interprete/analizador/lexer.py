@@ -23,12 +23,15 @@ reservadas = {
     'struct': 'STRUCT',
     'powf': 'POTENCIA_f64',
     'pow': 'POTENCIA_i64',
-    'println': 'PRINTLN', # impresión
+    'println': 'PRINTLN', # impresión con salto de línea
+    'print': 'PRINT', # impresión sin salto de línea
     'fn': 'FN',
     'abs': 'ABS', 
     'sqrt': 'SQRT', 
     'to_string': 'TO_STRING',
     'clone': 'CLONE',
+    'to_owned': 'TO_OWNED',
+    'chars': 'CHARS',
     'len': 'LEN', 
     'push': 'PUSH',
     'remove': 'REMOVE',
@@ -47,8 +50,6 @@ reservadas = {
     'continue': 'CONTINUE',
     'return': 'RETURN',
     '_': 'GUION_BAJO',
-    'to_owned': 'TO_OWNED',
-    'chars': 'CHARS'
 }
 
 # definimos los tokens de nuestro lenguaje
@@ -66,7 +67,7 @@ tokens = [
     'OR', 'AND', 'NOT', # lógicos
     # funciones
     'FLECHA_GUION', # funciones y métodos
-    'FLECHA_IGUAL', 'GUION_BAJO', 'BARRA', # match (similar al switch)
+    'FLECHA_IGUAL', 'BARRA', # match (similar al switch)
     # identificadores
     'IDENTIFICADOR',
 ] + list(reservadas.values())
@@ -90,6 +91,8 @@ t_LLAVE_CIERRA = r'\}';
 t_COMA = r',';
 t_PUNTO_COMA = r';';
 t_DOS_PUNTOS = r':';
+t_FLECHA_GUION = r'->';
+t_FLECHA_IGUAL = r'=>';
 t_PUNTO = r'\.';
 t_SUMA = r'\+';
 t_RESTA = r'\-';
@@ -106,8 +109,6 @@ t_IGUALACION = r'=';
 t_OR = r'\|\|';
 t_AND = r'&&';
 t_NOT = r'!';
-t_FLECHA_GUION = r'->';
-t_FLECHA_IGUAL = r'=>';
 t_AMPERSON = r'\&';
 t_BARRA = r'\|';
 

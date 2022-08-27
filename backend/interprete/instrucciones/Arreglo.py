@@ -28,7 +28,7 @@ class Arreglo(Instruccion):
 
     def ejecutar(self, console: Console, scope: Scope):
         # primero miramos de que tipo de dato será el arreglo
-        # y las dimensiones que tendrá
+        # y las dimensiones que tendrá}
         _tipo: TipoDato = None;
         _dimensiones:list = [];
         if (self.dimension != None):
@@ -47,6 +47,14 @@ class Arreglo(Instruccion):
 
             for dim in self.dimension.dimensiones:
                 _dimensiones.append(dim);
+        # with_capacity
+        val_with_capacity = None;
+        if (self.with_capacity != None):
+            val_with_capacity = self.with_capacity.ejecutar(console, scope);
+            if (val_with_capacity.tipo != TipoDato.INT64):
+                #ERROR. Se esperaba un int
+                pass;
+            val_with_capacity = val_with_capacity.valor;
 
         # inicializamos el arreglo resultante que quedará
         listaResultante:list = [];
@@ -54,8 +62,9 @@ class Arreglo(Instruccion):
         iAux:int = -1 if (len(_dimensiones) == 0) else len(_dimensiones) - 1;
         listaResultante = self.nuevaDimension(self.valor, console, scope, _tipo, _dimensiones, iAux);
         # esto nos ayudará para saber que tipo de dato es en la asignación
-        scope.crearVariable(self.id, listaResultante, self.tipo, self.mut, self.esVector, self.with_capacity, self.linea, self.columna);
-        print("listaaaa::"+str(listaResultante));
+        if (self.tipo == None and self.dimension != None):
+            self.tipo = _tipo;
+        scope.crearVariable(self.id, listaResultante, self.tipo, self.mut, self.esVector, val_with_capacity, None, self.linea, self.columna);
 
     def nuevaDimension(self, valor, console: Console, scope: Scope, _tipo:TipoDato, dimensionesAux:list, iAux:int):
         # verificamos que se trate de una lista, sino es una expresion
@@ -111,7 +120,7 @@ class AsignacionArreglo(Instruccion):
         if (isinstance(self.expresion, Expresion)):
             val = self.expresion.ejecutar(console, scope);
         else:
-            arr = Arreglo(None, None, None, [], None, None, None);
+            arr = Arreglo(None, None, None, [], None, None, self.linea, self.columna);
             listaResultante:list = arr.nuevaDimension(self.expresion, console, scope, arr.tipo, [], -1);
         # indice
         indice:list = [];

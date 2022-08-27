@@ -15,7 +15,7 @@ class Acceso(Expresion):
         # buscamos y obtenemos el valor
         valor = scope.getValor(self.id, self.linea, self.columna);
         if (valor != None):
-            return RetornoExpresion(valor.valor, valor.tipo, None);
+            return valor;
         # error, no se encontró la variable
 
 class AccesoArreglo(Expresion):

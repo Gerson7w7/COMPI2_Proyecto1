@@ -61,5 +61,13 @@ class Chars(Expresion):
         self.expresion = expresion;
 
     def ejecutar(self, console: Console, scope: Scope):
-        # retorna lo que sea que venga, ya que solo es una copia
-        return self.expresion.ejecutar(console, scope);
+        # ejecutamos la expresión
+        val = self.expresion.ejecutar(console, scope);
+        if (val.tipo != TipoDato.STRING and val.tipo != TipoDato.STR):
+            # ERROR. Solo se puede convertir a una lista de caracteres si se trata de un string
+            pass;
+        # pasamos la cadena a una lista
+        listaChar:list = []
+        for c in val.valor:
+            listaChar.append(c);
+        return RetornoExpresion(listaChar, val.tipo, None);

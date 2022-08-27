@@ -12,7 +12,6 @@ class Bloque(Instruccion):
     def ejecutar(self, console: Console, scope: Scope):
         # creando un nuevo entorno
         newScope = Scope(scope);
-
         for instruccion in self.instrucciones:
             #try:
             val = instruccion.ejecutar(console, newScope);
