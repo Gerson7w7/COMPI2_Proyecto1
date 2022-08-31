@@ -1,8 +1,9 @@
 from ..instrucciones.Instruccion import Instruccion
 from ..expresiones.Expresion import Expresion
 from ..extra.Scope import Scope
-from ..extra.Console import Console
+from ..extra.Console import Console, _Error
 from ..extra.Tipos import TipoDato
+from datetime import datetime
 
 class Dimension:
     def __init__(self, tipo:str, dimensiones:list, esVector:bool):
@@ -53,7 +54,8 @@ class Arreglo(Instruccion):
             val_with_capacity = self.with_capacity.ejecutar(console, scope);
             if (val_with_capacity.tipo != TipoDato.INT64):
                 #ERROR. Se esperaba un int
-                pass;
+                _error = _Error(f'Se esperaba un i64, no un {val_with_capacity.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
+                raise Exception(_error);
             val_with_capacity = val_with_capacity.valor;
 
         # inicializamos el arreglo resultante que quedará
@@ -81,6 +83,8 @@ class Arreglo(Instruccion):
                 if (dimensionesAux[iAux] == cont):
                     return listaAux;
                 # ERROR. se esperaba un arreglo de {dimensionesAux[iAux]} elemenots y se encontró {cont} elementos.
+                _error = _Error(f'Se esperaba un arreglo de {dimensionesAux[iAux]} elementos y se encontró {cont} elementos', scope.ambito, self.linea, self.columna, datetime.now());
+                raise Exception(_error);
             return listaAux;
         elif (isinstance(valor, Expresion) == True):
             # cuando sea expresion
@@ -90,6 +94,8 @@ class Arreglo(Instruccion):
             if (val.tipo == self.tipo):
                 return val.valor;
             # ERROR. tipos incopatibles
+            _error = _Error(f'No se puede almacenar una expresion de tipo {val.tipo.name} en una variable de tipo {self.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         elif (isinstance(valor, Dimension) == True):
             # cuando sea expresion ; ENTERO
             for i in range(valor.dimensiones[0]):
@@ -98,13 +104,16 @@ class Arreglo(Instruccion):
                 self.tipo = val.tipo if (_tipo == None) else _tipo;
                 if (val.tipo != self.tipo):
                     # ERROR. tipos incopatibles
-                    pass;
+                    _error = _Error(f'No se puede almacenar una expresion de tipo {val.tipo.name} en una variable de tipo {self.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
+                    raise Exception(_error);
                 listaAux.append(val.valor);
                 cont += 1;
             if (iAux >= 0):
                 if (dimensionesAux[iAux] == cont):
                     return listaAux;
                 # ERROR. se esperaba un arreglo de {dimensionesAux[iAux]} elemenots y se encontró {cont} elementos.
+                _error = _Error(f'Se esperaba un arreglo de {dimensionesAux[iAux]} elementos y se encontró {cont} elementos', scope.ambito, self.linea, self.columna, datetime.now());
+                raise Exception(_error);
             return listaAux;
 
 
@@ -128,7 +137,8 @@ class AsignacionArreglo(Instruccion):
             index = i.ejecutar(console, scope);
             if (index.tipo != TipoDato.INT64):
                 # ERROR. No sepuede acceder a la posición index.valor
-                pass;
+                _error = _Error(f'No sepuede acceder a la posición {index.valor}', scope.ambito, self.linea, self.columna, datetime.now());
+                raise Exception(_error);
             indice.append(index.valor);
         if (isinstance(self.expresion, Expresion)):    
             scope.setValorArreglo(self.id, val.valor, val.tipo, indice, self.linea, self.columna);

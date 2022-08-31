@@ -17,7 +17,8 @@ class Bloque(Instruccion):
                 if (val != None):
                     return val;
             except Exception as e:
-                # errores para recuperarse
+                # errores para 
+                print("ERRR:: "+str(e))
                 console.append(f'ERROR: {e.args[0].descripcion}. En la línea {e.args[0].linea}, columna {e.args[0].columna}\n');
                 # agregamos a lista de errores
                 console.error(e.args[0]);
