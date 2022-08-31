@@ -16,7 +16,7 @@ class While(Instruccion):
         if (valCondicion.tipo != TipoDato.BOOLEAN): pass; # error tiene que se bool 
         while(valCondicion.valor):
             # ejecutamos las instrucciones dentro del loop
-            val = self.bloque.ejecutar(console, scope);
+            val = self.bloque.ejecutar(console, scope, 'While');
             # si es una instruccion de transferencia se analiza
             if (val != None):
                 # break

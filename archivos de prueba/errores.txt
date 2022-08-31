@@ -1,12 +1,11 @@
 fn main(){
     // PRUEBA SIN ERRORES SIMPLE
-    let sum : i64 = 5+5;
     println!("sum: {} ", sum);
-    let mut mult : i64 = 5*5;
+    let mut mult : i64 = 5*5.5;
     println!("mult: {} ", mult);
-    let div : f64 = 5/5;
+    let div : f64 = true/false;
     println!("div: {} ", div);
-    let _mod = 5%5;
+    let _mod = '5'%'5';
     println!("_mod: {} ", _mod);
     let _pow : i64 = i64::pow(3, 3);
     println!("_pow: {} ", _pow);
@@ -68,44 +67,6 @@ fn main(){
         _ => println!("estoi entre 7 a infinitoosiuuu :D {}", condicion),
     }
 
-    // =======================================
-    let mut _loop:i64 = 0;
-    loop {
-        if _loop == 5 {
-            break;
-        }
-        println!("loop : {}", _loop)
-        _loop = _loop+1;
-    }
-
-    // =======================================
-    let mut _loop:i64 = 0;
-    let mut flag = true;
-    let _final = 
-    loop {
-        println!("loop: {}", _loop);
-        if flag && _loop == 5 {
-            flag = !flag;
-            continue;
-        } else if _loop == 10 {
-            break _loop;
-        }
-        _loop = _loop+1;
-    };
-    println!("finallll : {}", _final);
-
-    // ================WHILE=======================
-    let mut var1 = 0;
-    let mut flag = true;
-    while var1 < 10 {
-        println!("{}", var1); // imprime 0123456789
-        if flag && var1 == 5 {
-            println!("soi un continue");
-            flag = !flag;
-            continue;
-        }
-        var1 = var1 + 1;
-    }
 
     // ========== ABS ===========
     let mut absoluto = -50.abs();
@@ -132,7 +93,7 @@ fn main(){
     println!("copia: {}", copia);
 
     // ======= CASTEO =====
-    let suma: i64 = 5.5 as i64 + 10;
+    let suma: i64 = 5.5 as bool + 10;
     println!("suma: {}", suma);
 
     // ============= ARREGLOS =============
@@ -167,8 +128,8 @@ fn main(){
     [ [ 2; 4 ], [ 0; 4 ] ]
     ];
     println!("arr5: {:?}", arr5); // imprime toda la lista
-    println!("pos[0][1]: {:?}", arr5[0][1]); // imprime 5,5,5,5
-    println!("pos[1][0][0]: {}", arr5[1][0][0]); // imprime 2
+    println!("pos[0][1]: {:?}", arr5["0"]["1"]); // imprime 5,5,5,5
+    println!("pos[1][0][0]: {}", arr5[1][0][10]); // imprime 2
     //arr5[0][1] = [-1;4];
     arr5[0][1] = [1,1,1,1];
     println!("arr5: {:?}", arr5); // imprime toda la lista
@@ -267,77 +228,4 @@ fn void() {
 fn fnVector(v:Vec<&str>, arr:&mut [bool; 5]){
     println!("{:?}", v);
     println!("{:?}", arr);
-}
-
-// ====================== paso por referencia =============
-fn valores(x: &mut [i64; 3], y: i64) -> i64 {
-    x[0] = 3;
-    return y * 5;
-}
-fn main () {
-    let mut x: [i64; 3] = [10, 12, 45];
-    let y: i64 = 5;
-    let z = valores(&mut x, y);
-    println!("cambio por referencia: {:?}", x);
-    println!("y sin cambio: {}", y);
-    println!("resultado z: {}", z);
-}
-
-//====================== retorno vect =============
-fn lista(x: &mut Vec<i64>, y: i64) -> Vec<i64> {
-    x.push(y);
-    return x;
-}
-fn main () {
-    let mut x: Vec<i64> = Vec::new();
-    let y: i64 = 5;
-    let z = lista(&mut x, y);
-    x.push(10);
-    println!("vector original x: {:?}", x);
-    println!("vector del return z: {:?}", z);
-}
-
-// ============= STRUCTS =========== 
-// Struct
-struct Personaje {
-    nombre: String,
-    edad: i64,
-    descripcion: String
-}
-// Struct
-struct Carro {
-    placa: String,
-    color: String,
-    tipo: String
-}
-fn main(){
-    // Construcción Struct
-    let mut p1 = Personaje { edad:18, descripcion:"No hace nada".to_string(), nombre:"Fer".to_string() };
-    let mut p2 = Personaje { nombre:"Fer".to_string(), edad:18,
-    descripcion:"Maneja un carro".to_string()};
-    let mut c1 = Carro { color:"gris".to_string(), placa:"090PLO".to_string(), tipo:"mecanico".to_string() };
-    let mut c2 = Carro { placa:"P0S921".to_string(),
-    color:"verde".to_string(), tipo:"automatico".to_string() };
-    // Asignación Atributos
-    p1.edad = 10; // Cambio aceptado
-    p2.edad = 20; // Cambio aceptado
-    c1.color = "cafe".to_string(); // Cambio aceptado
-    c2.color = "rojo".to_string(); // Cambio aceptado
-    // Acceso Atributo
-    println!("========= P1 ======");
-    println!("{}", p1.nombre); 
-    println!("{}", p1.edad);
-    println!("{}", p1.descripcion);
-    println!("========= P2 ======");
-    println!("{}", p2.nombre); 
-    println!("{}", p2.edad);
-    println!("{}", p2.descripcion);
-    println!("========= C1 ======");
-    println!("{}", c1.placa);
-    println!("{}", c1.color);
-    println!("{}", c1.tipo);
-    println!("========= C2 ======");
-    println!("{}", c2.placa);
-    println!("{}", c2.color);
-    println!("{}", c2.tipo);
 }

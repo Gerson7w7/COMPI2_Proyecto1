@@ -11,7 +11,7 @@ class Loop(Instruccion):
     def ejecutar(self, console: Console, scope: Scope):
         while(True):
             # ejecutamos las instrucciones dentro del loop
-            val = self.bloque.ejecutar(console, scope);
+            val = self.bloque.ejecutar(console, scope, 'Loop');
             # si es una instruccion de transferencia se analiza
             if (val != None):
                 # break

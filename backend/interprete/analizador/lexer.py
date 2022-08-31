@@ -136,12 +136,16 @@ def t_IDENTIFICADOR(t):
 # contamos las líneas del código
 def t_nuevalinea(t):
     r'(\r\n)+|\n+';
-    t.lexer.lineno += len(t.value)
+    t.lexer.lineno += t.value.count(t.value);
 
 # manejo de errores léxicos
 def t_error(t):
     print(f'Caracter no reconocido {t.value[0]!r}. En la linea {t.lexer.lineno}')
     t.lexer.skip(1)
+
+def find_column(inp, token):
+    line_start = inp.rfind('\n', 0, token.lexpos) + 1;
+    return (token.lexpos - line_start) + 1;
 
 def t_comentario(t):
     r'//.*';

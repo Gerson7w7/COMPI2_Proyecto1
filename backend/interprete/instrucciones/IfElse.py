@@ -20,6 +20,6 @@ class IfElse(Instruccion):
             pass;
         # verificamos si es true o false
         if (valCondicion.valor):
-            return self.bloque.ejecutar(console, scope);
+            return self.bloque.ejecutar(console, scope, 'If');
         elif (self.bloqueElse != None):
             return self.bloqueElse.ejecutar(console, scope);

@@ -3,13 +3,17 @@ import copy
 from ..extra.TablaSimbolo import TablaSimbolo
 from .Tipos import TipoDato 
 from .Simbolo import Simbolo
+from .Console import _Error
+from datetime import datetime
 
 class Scope:
-    def __init__(self, padre):
+    def __init__(self, padre, ambito:str):
         self.padre = padre;
+        self.ambito = ambito;
         self.simbolos = [];
         self.variables = {};
         self.funciones = {};
+        self.structs = {};
     
     # función para crear una variable
     def crearVariable(self, id: str, valor, tipo: TipoDato, mut:bool, esVector:bool, with_capacity:int, referencia, linea: int, columna: int):
@@ -17,8 +21,9 @@ class Scope:
         while(scope != None):
             # verificamos que no se haya declarado antes la misma variable
             if(scope.variables.get(id)):
-                pass;
                 # ERROR: la variable ya ha sido declarada
+                _error = _Error(f'No se ha podido efectuar la operacion {self.tipo} con {val1.valor} y {val2.valor}', scope.ambito, self.linea, self.columna, datetime.now())
+                raise Exception(_error);
             scope = scope.padre;
         # procedemos a crear la variable
         self.variables[id] = Simbolo(valor, id, tipo, mut, esVector, with_capacity, referencia);
@@ -32,6 +37,7 @@ class Scope:
             if (scope.variables.get(id) != None):
                 return scope.variables.get(id);
             scope = scope.padre;
+        print("error: no se ha encontrado la variable");
         # error: no se ha encontrado la variable
 
     # función para obtener el scopeo más general, el global
@@ -77,9 +83,6 @@ class Scope:
                 # si se pasó por referencia cambiamos también la original
                 if (val.referencia != None):
                     ref = val.referencia;
-                    print("feee "+ref.id)
-                    print("feee "+str(ref.scope.variables))
-                    print("feee "+str(ref.scope.variables))
                     ref.scope.variables.update({ref.id : Simbolo(valNuevo, ref.id, val.tipo, ref.val.mut, ref.val.esVector, ref.val.with_capacity, ref.val.referencia)});
             scope = scope.padre;
 
@@ -114,5 +117,26 @@ class Scope:
         while(scope != None):
             if (scope.funciones.get(id) != None):
                 return scope.funciones.get(id);
+            scope = scope.padre;
+        # error: no se ha encontrado la variable
+
+    def guardarStruct(self, id:str, struct, linea:int, columna:int):
+        scope: Scope = self;
+        while(scope != None):
+            # verificamos que no se haya declarado antes la misma funcion
+            if(scope.structs.get(id)):
+                pass;
+                # ERROR: la funcion ya ha sido declarada
+            scope = scope.padre;
+        # procedemos a guardar la funcion
+        self.structs[id] = struct;
+        # lo guardamos en la tabla de simbolos
+        self.simbolos.append(TablaSimbolo(id, 'struct', id, '', linea, columna));
+
+    def getStruct(self, id:str, linea:int, columna:int):
+        scope: Scope = self;
+        while(scope != None):
+            if (scope.structs.get(id) != None):
+                return scope.structs.get(id);
             scope = scope.padre;
         # error: no se ha encontrado la variable

@@ -11,7 +11,7 @@ from ..expresiones.Literal import Literal
 from interprete.instrucciones.Imprimir import Imprimir
 from interprete.expresiones.Relacional import Relacional
 from ..expresiones.Logico import Logico
-from ..expresiones.Acceso import Acceso, AccesoArreglo
+from ..expresiones.Acceso import Acceso, AccesoArreglo, AccesoStruct
 from interprete.instrucciones.Bloque import Bloque
 from interprete.instrucciones.IfElse import IfElse
 from interprete.instrucciones.Match import Case, Match
@@ -26,7 +26,8 @@ from interprete.instrucciones.FuncionesVector import Push, Insert, Remove, Conta
 from interprete.instrucciones.Instruccion import Instruccion
 from ..instrucciones.ForIn import ForIn
 from ..instrucciones.Funcion import Funcion
-from ..instrucciones.LlamadaFuncion import LlamadaFuncion
+from ..instrucciones.LlamadaFuncion import LlamadaFuncion, Puntero
+from ..instrucciones.Struct import AsignacionStruct, InstanciaStruct, Struct, ExpresionesStruct
 
 tokens = lexer.tokens;
 
@@ -76,12 +77,17 @@ def p_struct(p):
     """
     struct : STRUCT IDENTIFICADOR bloque_struct
     """
+    p[0] = Struct(p[2], p[3], p.lineno(1), p.lexpos(1));
 
 def p_bloque_struct(p):
     """
-    bloque_struct : CORCHETE_ABRE parametros CORCHETE_CIERRA
+    bloque_struct : LLAVE_ABRE parametros LLAVE_CIERRA
+        | LLAVE_ABRE LLAVE_CIERRA
     """
-    p[0] = p[2];
+    if (len(p) == 4):
+        p[0] = p[2];
+    else:
+        p[0] = [];
 
 def p_parametros(p):
     """
@@ -189,6 +195,8 @@ def p_declaracion(p):
             p[0] = Arreglo(True, p[3], p[5], [], True, None, p.lineno(1), p.lexpos(1));
         elif(isinstance(p[6], WithCapacity)):
             p[0] = Arreglo(True, p[3], p[5], [], True, p[6].capacidad, p.lineno(1), p.lexpos(1));
+        elif (isinstance(p[6], ExpresionesStruct)):
+            p[0] = InstanciaStruct(True, p[3], p[5], p[6], p.lineno(1), p.lexpos(1));
     elif (len(p) == 5):
         if (isinstance(p[4], Expresion) or isinstance(p[4], Instruccion)):
             p[0] = Declaracion(True, p[3], None, p[4], p.lineno(1), p.lexpos(1));
@@ -200,6 +208,8 @@ def p_declaracion(p):
             p[0] = Arreglo(True, p[3], None, [], True, None, p.lineno(1), p.lexpos(1));
         elif(isinstance(p[4], WithCapacity)):
             p[0] = Arreglo(True, p[3], None, [], True, p[4].capacidad, p.lineno(1), p.lexpos(1));
+        elif (isinstance(p[4], ExpresionesStruct)):
+            p[0] = InstanciaStruct(True, p[3], None, p[4], p.lineno(1), p.lexpos(1));
     elif (len(p) == 6):
         if (isinstance(p[5], Expresion) or isinstance(p[5], Instruccion)):
             p[0] = Declaracion(False, p[2], p[4], p[5], p.lineno(1), p.lexpos(1));
@@ -211,6 +221,8 @@ def p_declaracion(p):
             p[0] = Arreglo(False, p[2], p[4], [], True, None, p.lineno(1), p.lexpos(1));
         elif(isinstance(p[5], WithCapacity)):
             p[0] = Arreglo(False, p[2], p[4], [], True, p[5].capacidad, p.lineno(1), p.lexpos(1));
+        elif (isinstance(p[5], ExpresionesStruct)):
+            p[0] = InstanciaStruct(True, p[2], p[4], p[5], p.lineno(1), p.lexpos(1));
     else:
         if (isinstance(p[3], Expresion) or isinstance(p[3], Instruccion)):
             p[0] = Declaracion(False, p[2], None, p[3], p.lineno(1), p.lexpos(1));
@@ -222,6 +234,8 @@ def p_declaracion(p):
             p[0] = Arreglo(False, p[2], None, [], True, None, p.lineno(1), p.lexpos(1));
         elif(isinstance(p[3], WithCapacity)):
             p[0] = Arreglo(False, p[2], None, [], True, p[3].capacidad, p.lineno(1), p.lexpos(1));
+        elif (isinstance(p[3], ExpresionesStruct)):
+            p[0] = InstanciaStruct(True, p[5], None, p[3], p.lineno(1), p.lexpos(1));
 
 def p_declaracion_tipo(p):
     """
@@ -238,8 +252,10 @@ def p_type(p):
         | BOOL  
         | CHAR
         | STRING
+        | IDENTIFICADOR 
         | AMPERSON STR
     """
+    # POSIBLE EFE POR EL IDENTIFICADOR
     if (len(p) == 2):
         p[0] = p[1];
     elif (len(p) == 3):
@@ -266,6 +282,7 @@ def p_igualacion(p):
     igualacion : IGUALACION expresion
         | IGUALACION CORCHETE_ABRE lista_arreglo CORCHETE_CIERRA
         | IGUALACION declaracion_vector
+        | IGUALACION instancia_struct
     """
     if (len(p) == 3):
         # expresion o vector
@@ -276,6 +293,28 @@ def p_igualacion(p):
             p[0] = tuple(p[3]);
         else:
             p[0] = p[3];
+
+def p_instancia_struct(p):
+    """
+    instancia_struct : IDENTIFICADOR LLAVE_ABRE args_struct LLAVE_CIERRA
+    """
+    p[0] = ExpresionesStruct(p[1], p[3]);
+
+def p_args_struct(p):
+    """
+    args_struct : args_struct COMA arg_struct
+        | arg_struct
+    """
+    if (len(p) == 4):
+        p[1].append(p[3]); p[0] = p[1];
+    else:
+        p[0] = [p[1]];
+
+def p_arg_struct(p):
+    """
+    arg_struct : IDENTIFICADOR DOS_PUNTOS expresion
+    """
+    p[0] = Declaracion(True, p[1], None, p[3], p.lineno(1), p.lexpos(1));
 
 def p_declaracion_vector(p):
     """
@@ -431,11 +470,14 @@ def p_expresion_identificador(p):
     """
     expresion : IDENTIFICADOR
         | IDENTIFICADOR indice_arreglo
+        | expresion PUNTO IDENTIFICADOR
     """
     if (len(p) == 2):
         p[0] = Acceso(p[1], p.lineno(1), p.lexpos(1));
-    else:
+    elif (len(p) == 3):
         p[0] = AccesoArreglo(p[1], p[2], p.lineno(1), p.lexpos(1));
+    else:
+        p[0] = AccesoStruct(p[1], p[3], p.lineno(1), p.lexpos(1));
 
 def p_indice_arreglo(p):
     """
@@ -536,7 +578,7 @@ def p_expresiones(p):
     if (len(p) == 4):
         p[1].append(p[3]); p[0] = p[1];
     else:
-        p[0] = [p[1]];  
+        p[0] = [p[1]];
 
 def p_tipo_expresion(p):
     """
@@ -544,7 +586,7 @@ def p_tipo_expresion(p):
         | expresion
     """
     if (len(p) == 4):
-        p[0] = p[3];
+        p[0] = Puntero(p[3]);
     else:
         p[0] = p[1];
 
@@ -552,9 +594,12 @@ def p_asignacion(p):
     """
     asignacion : IDENTIFICADOR igualacion
         | IDENTIFICADOR indice_arreglo igualacion
+        | expresion PUNTO IDENTIFICADOR igualacion
     """
     if (len(p) == 3):
         p[0] = Asignacion(p[1], p[2], p.lineno(1), p.lexpos(1));
+    elif (len(p) == 5):
+        p[0] = AsignacionStruct(p[1], p[3], p[4], p.lineno(1), p.lexpos(1));
     else:
         p[0] = AsignacionArreglo(p[1], p[2], p[3], p.lineno(1), p.lexpos(1));
 

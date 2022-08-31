@@ -149,7 +149,7 @@ const Inicio = () => {
               <button
                 className="dropdown-item"
                 onClick={() => {
-                  navigate("/AST");
+                  navigate("/errores");
                 }}
               >
                 Errores

@@ -10,7 +10,7 @@ class LlamadaFuncion(Instruccion):
         self.argumentos = argumentos;
     
     def ejecutar(self, console: Console, scope: Scope):
-        newScope = Scope(scope.getGlobal());
+        newScope = Scope(scope.getGlobal(), 'Funcion');
         # obtenemos la función 
         funcion:Funcion = scope.getFuncion(self.id, self.linea, self.columna);
         # verificando si la cantidad de argumentos son == a la cantidad de parámetros de la función
@@ -18,19 +18,22 @@ class LlamadaFuncion(Instruccion):
             # ERROR. Se esperaban x parametros y se encontraron x argumentos
             pass;
         for i in range(len(self.argumentos)):
-            val = self.argumentos[i].ejecutar(console, scope);
+            if (isinstance(self.argumentos[i], Puntero)):
+                val = self.argumentos[i].expresion.ejecutar(console, scope);
+            else:
+                val = self.argumentos[i].ejecutar(console, scope);
             # verificando el tipo correcto del argumento
             funcion.tipoArgumentos(val.tipo, i, console, scope);
             # obtenemos el id del parametro correspondiente
             idParam = funcion.parametros[i].id;
-            if (isinstance(val.valor, list)):
-                idReferencia = self.argumentos[i].id;
+            if (isinstance(self.argumentos[i], Puntero)):
+                idReferencia = self.argumentos[i].expresion.id;
                 referencia = Referencia(scope, idReferencia, val);
                 newScope.crearVariable(idParam, val.valor, val.tipo, True, val.esVector, val.with_capacity, referencia, self.linea, self.columna);
             else:
-                newScope.crearVariable(idParam, val.valor, val.tipo, True, None, None, None, self.linea, self.columna);
+                newScope.crearVariable(idParam, val.valor, val.tipo, True, None, None, val.referencia, self.linea, self.columna);
         # ejecutando las instrucciones de la función 
-        valBloque = funcion.bloque.ejecutar(console, newScope);
+        valBloque = funcion.bloque.ejecutar(console, newScope, 'Funcion');
         # verificando el retorno de la función
         if (valBloque != None):
             funcion.tipoRetorno(valBloque.tipo);
@@ -43,3 +46,7 @@ class Referencia:
         self.scope = scope;
         self.id = id;
         self.val = val;
+
+class Puntero:
+    def __init__(self, expresion):
+        self.expresion = expresion;

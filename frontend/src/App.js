@@ -5,8 +5,7 @@ import {
   Route
 } from "react-router-dom";
 import Inicio from "./components/Inicio";
-//import ErrorPage from "./components/ErrorPage";
-//import ErroresReport from "./components/ErroresReport";
+import Errores from "./components/Errores";
 //import ASTReport from "./components/ASTReport";
 //import SimbolosReport from "./components/SimbolosReport";
 
@@ -15,8 +14,8 @@ function App() {
     <Router>
       <Routes>
         <Route path='/' element={<Inicio />} />
-        {/*<Route path='/errores' element={<ErroresReport />} />
-        <Route path='/AST' element={<ASTReport />} />
+        <Route path='/errores' element={<Errores />} />
+        {/*<Route path='/AST' element={<ASTReport />} />
         <Route path='/simbolos' element={<SimbolosReport />} />
         <Route path='*' element={<ErrorPage />} /> */}
       </Routes>

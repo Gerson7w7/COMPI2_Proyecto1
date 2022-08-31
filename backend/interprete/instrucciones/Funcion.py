@@ -17,12 +17,6 @@ class Funcion(Instruccion):
             scope.guardarFuncion(self.id, self, self.retorno_fn.tipo, self.linea, self.columna);
         else:
             scope.guardarFuncion(self.id, self, self.retorno_fn, self.linea, self.columna);
-        # si es el main se ejecuta de una vez
-        if (self.id == 'main'):
-            _main = self.bloque.ejecutar(console, scope);
-            if (_main != None):
-                # ERROR. no se esperaba una sentencia de control de tipo _main.retorno
-                pass;
 
     def tipoArgumentos(self, argTipo, i:int, console:Console, scope:Scope):
         if (isinstance(self.parametros[i], Arreglo)):

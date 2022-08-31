@@ -15,7 +15,7 @@ class ForIn(Instruccion):
 
     def ejecutar(self, console: Console, scope: Scope):
         # nuevo scope
-        newScope = Scope(scope);
+        newScope = Scope(scope, 'ForIn');
         if (isinstance(self.iterable, list)):
             # rango
             if (len(self.iterable) == 2):
@@ -32,7 +32,7 @@ class ForIn(Instruccion):
                     asignacion = Asignacion(self.id, Literal(i, TipoDato.INT64, self.linea, self.columna), self.linea, self.columna);
                     asignacion.ejecutar(console, newScope);
                     # ejecutamos el bloque de código
-                    valBloque = self.bloque.ejecutar(console, newScope);
+                    valBloque = self.bloque.ejecutar(console, newScope, 'ForIn');
                     # si es una instruccion de transferencia se analiza
                     if (valBloque != None):
                         # break
@@ -59,7 +59,7 @@ class ForIn(Instruccion):
                     asignacion = Asignacion(self.id, Literal(i, arr.tipo, self.linea, self.columna), self.linea, self.columna);
                     asignacion.ejecutar(console, newScope);
                     # ejecutamos el bloque de código
-                    valBloque = self.bloque.ejecutar(console, newScope);
+                    valBloque = self.bloque.ejecutar(console, newScope, 'ForIn');
                     # si es una instruccion de transferencia se analiza
                     if (valBloque != None):
                         # break
@@ -89,7 +89,7 @@ class ForIn(Instruccion):
                     asignacion = Asignacion(self.id, Literal(i, val.tipo, self.linea, self.columna), self.linea, self.columna);
                     asignacion.ejecutar(console, newScope);
                     # ejecutamos el bloque de código
-                    valBloque = self.bloque.ejecutar(console, newScope);
+                    valBloque = self.bloque.ejecutar(console, newScope, 'ForIn');
                     # si es una instruccion de transferencia se analiza
                     if (valBloque != None):
                         # break

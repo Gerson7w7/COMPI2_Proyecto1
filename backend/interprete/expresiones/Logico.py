@@ -2,8 +2,9 @@ from interprete.extra.Retorno import RetornoExpresion
 from interprete.extra.Tipos import TipoDato
 from interprete.extra.Tipos import TipoLogico
 from .Expresion import Expresion
-from ..extra.Console import Console
+from ..extra.Console import Console, _Error
 from ..extra.Scope import Scope
+from datetime import datetime
 
 class Logico(Expresion):
     def __init__(self, izquierda, derecha, tipo:TipoLogico, linea, columna):
@@ -28,9 +29,13 @@ class Logico(Expresion):
                 print("and: " + str(val1.valor and val2.valor))
                 return RetornoExpresion(val1.valor and val2.valor, TipoDato.BOOLEAN, None);
             # error solo se acepta bools
+            _error = _Error(f'Solo se puede comparar a nivel lógico tipos booleanos', scope.ambito, self.linea, self.columna, datetime.now())
+            raise Exception(_error);
         else:
             # NOT
             if (val1.tipo == TipoDato.BOOLEAN):
                 print("not: " + str(not val1.valor))
                 return RetornoExpresion(not val1.valor, TipoDato.BOOLEAN, None);
-            # ERROR solo se aceptan bools 
+            # ERROR solo se aceptan bools
+            _error = _Error(f'Solo se puede comparar a nivel lógico tipos booleanos', scope.ambito, self.linea, self.columna, datetime.now())
+            raise Exception(_error);

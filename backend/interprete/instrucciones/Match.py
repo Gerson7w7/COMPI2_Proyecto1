@@ -1,3 +1,4 @@
+from .Bloque import Bloque
 from interprete.expresiones.Relacional import Relacional
 from interprete.extra.Tipos import TipoRelacional
 from .Instruccion import Instruccion
@@ -33,7 +34,10 @@ class Case(Instruccion):
         self.cuerpo = cuerpo;
 
     def ejecutar(self, console: Console, scope: Scope):
+        if (isinstance(self.cuerpo, Bloque)):
+            return self.cuerpo.ejecutar(console, scope, 'Match');
         return self.cuerpo.ejecutar(console, scope);
+
     
     def comparar(self):
         return self.coincidencias;
