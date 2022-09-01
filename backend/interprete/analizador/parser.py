@@ -40,6 +40,7 @@ precedence = (
     ('left', 'MODULO'),
     ('left', 'MULTIPLICACION', 'DIVISION'),
     ('left', 'AS'),
+    ('left', 'PUNTO'),
     ('right', 'NOT'),
     ('right', 'UMENOS'),
 )
@@ -253,6 +254,7 @@ def p_type(p):
         | CHAR
         | STRING
         | IDENTIFICADOR 
+        | USIZE
         | AMPERSON STR
     """
     # POSIBLE EFE POR EL IDENTIFICADOR
@@ -447,7 +449,6 @@ def p_expresion_terminales(p):
         | TRUE
         | FALSE
         | CARACTER
-        | CADENA
     """
     # terminales
     if (type(p[1]) == int):
@@ -459,12 +460,16 @@ def p_expresion_terminales(p):
     elif (p[1] == 'true' or p[1] == 'false'):
         # bools
         p[0] = Literal(p[1], TipoDato.BOOLEAN, p.lineno(1), p.lexpos(1));
-    elif (re.fullmatch(r'.', p[1])):
+    else:
         # chars
         p[0] = Literal(p[1], TipoDato.CHAR, p.lineno(1), p.lexpos(1));
-    else:
-        # strings
-        p[0] = Literal(p[1], TipoDato.STRING, p.lineno(1), p.lexpos(1));
+
+def p_expresion_strings(p):
+    """
+    expresion : CADENA
+    """
+    # strings
+    p[0] = Literal(p[1], TipoDato.STRING, p.lineno(1), p.lexpos(1));
 
 def p_expresion_identificador(p):
     """
@@ -743,8 +748,8 @@ def p_empty(p):
     p[0] = None;
 
 # error sintáctico
-# def p_error(p):
-#     print(f'Error de sintaxis {p.type}, linea: {p.lineno}, columna: {p.lexpos}')
+def p_error(p):
+    raise Exception(f'Error de sintaxis {p.type}, linea: {p.lineno}, columna: {p.lexpos}')
 
 # construyendo el parser (analizador sintáctico)
 parser = yacc()

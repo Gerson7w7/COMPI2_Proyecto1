@@ -33,7 +33,7 @@ class Arreglo(Instruccion):
         _tipo: TipoDato = None;
         _dimensiones:list = [];
         if (self.dimension != None):
-            if (self.dimension.tipo == 'i64'):
+            if (self.dimension.tipo == 'i64' or self.dimension.tipo == 'usize'):
                 _tipo = TipoDato.INT64
             elif (self.dimension.tipo == 'f64'):
                 _tipo = TipoDato.FLOAT64
@@ -54,7 +54,7 @@ class Arreglo(Instruccion):
             val_with_capacity = self.with_capacity.ejecutar(console, scope);
             if (val_with_capacity.tipo != TipoDato.INT64):
                 #ERROR. Se esperaba un int
-                _error = _Error(f'Se esperaba un i64, no un {val_with_capacity.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
+                _error = _Error(f'Se esperaba un i64 para la capacidad del vector, no un {val_with_capacity.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
                 raise Exception(_error);
             val_with_capacity = val_with_capacity.valor;
 
@@ -66,7 +66,8 @@ class Arreglo(Instruccion):
         # esto nos ayudará para saber que tipo de dato es en la asignación
         if (self.tipo == None and self.dimension != None):
             self.tipo = _tipo;
-        scope.crearVariable(self.id, listaResultante, self.tipo, self.mut, self.esVector, val_with_capacity, None, self.linea, self.columna);
+        tipoSimbolo:str = 'Vector' if (self.esVector) else 'Arreglo';
+        scope.crearVariable(self.id, listaResultante, tipoSimbolo, self.tipo, self.mut, self.esVector, val_with_capacity, None, self.linea, self.columna, console);
 
     def nuevaDimension(self, valor, console: Console, scope: Scope, _tipo:TipoDato, dimensionesAux:list, iAux:int):
         # verificamos que se trate de una lista, sino es una expresion
@@ -118,7 +119,7 @@ class Arreglo(Instruccion):
 
 
 class AsignacionArreglo(Instruccion):
-    def __init__(self, id:str, indices:list, expresion, linea: int, columna: int):
+    def __init__(self, id:str, indices:list, expresion, linea: int, columna: int): 
         super().__init__(linea, columna);
         self.id = id;
         self.indices = indices;
@@ -140,7 +141,7 @@ class AsignacionArreglo(Instruccion):
                 _error = _Error(f'No sepuede acceder a la posición {index.valor}', scope.ambito, self.linea, self.columna, datetime.now());
                 raise Exception(_error);
             indice.append(index.valor);
-        if (isinstance(self.expresion, Expresion)):    
+        if (isinstance(self.expresion, Expresion)):
             scope.setValorArreglo(self.id, val.valor, val.tipo, indice, self.linea, self.columna);
         else:
             scope.setValorArreglo(self.id, listaResultante, arr.tipo, indice, self.linea, self.columna);

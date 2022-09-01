@@ -141,7 +141,7 @@ const Inicio = () => {
               <button
                 className="dropdown-item"
                 onClick={() => {
-                  navigate("/errores");
+                  navigate("/simbolos");
                 }}
               >
                 Tabla de símbolos

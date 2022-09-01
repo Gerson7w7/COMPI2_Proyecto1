@@ -10,20 +10,24 @@ class Imprimir(Instruccion):
         self.expresiones = expresiones;
 
     def ejecutar(self, console: Console, scope: Scope):
+        nuevaCadena:str = self.cadena;
         if (self.expresiones != None):
-            nuevaCadena:str = self.cadena;
             for expresion in self.expresiones:
                 val = expresion.ejecutar(console, scope)
                 if (isinstance(val.valor, list) == True):
                     nuevaCadena = nuevaCadena.replace("{:?}", str(val.valor), 1);
                 else:
                     nuevaCadena = nuevaCadena.replace("{}", str(val.valor), 1);
+            # para agregar los saltos de líneas que vengas explícitos
+            nuevaCadena = nuevaCadena.replace('\\n', '\n');
             if (self.saltoLinea):
                 console.append(nuevaCadena + '\n');
             else:
                 console.append(nuevaCadena);
         else:
+            # para agregar los saltos de líneas que vengas explícitos
+            nuevaCadena = nuevaCadena.replace('\\n', '\n');
             if (self.saltoLinea):
-                console.append(self.cadena + '\n');
+                console.append(nuevaCadena + '\n');
             else:
                 console.append(nuevaCadena);

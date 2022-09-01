@@ -97,7 +97,7 @@ fn main(){
     println!("suma: {}", suma);
 
     // ============= ARREGLOS =============
-    let arr1: [&str; 2] = ["Hola", "Mundo"];
+    let arr1: [&str; 1] = ["Hola", "Mundo"];
     println!("arr1: {:?}", arr1); 
     arr1[0] = "Adios";
     println!("arr1: {:?}", arr1); 
@@ -153,7 +153,7 @@ fn main(){
     println!("vector3 => {:?}", vector3);
 
     // ============ METODOS PARA VECTORES =========== 
-    let mut vector4: Vec<&str> = Vec::with_capacity(3);
+    let mut vector4: Vec<&str> = Vec::with_capacity("df");
     println!("Capacidad del vector es de: {}", vector4.capacity());
     println!("vector4 => {:?}", vector4);
     vector4.push("Ola");

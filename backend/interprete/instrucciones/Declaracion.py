@@ -1,8 +1,9 @@
 from ..extra.Tipos import TipoDato
 from .Instruccion import Instruccion
-from ..extra.Console import Console
+from ..extra.Console import Console, _Error
 from ..extra.Scope import Scope
 from ..extra.Retorno import RetornoExpresion
+from datetime import datetime
 
 class Declaracion(Instruccion):
     def __init__(self, mut:bool, id: str, tipo: str, valor, linea: int, columna: int):
@@ -16,7 +17,7 @@ class Declaracion(Instruccion):
         # analizando el tipo de dato
         _tipo: TipoDato = None;
         if (self.tipo != None):
-            if (self.tipo == 'i64'):
+            if (self.tipo == 'i64' or self.tipo == 'usize'):
                 _tipo = TipoDato.INT64
             elif (self.tipo == 'f64'):
                 _tipo = TipoDato.FLOAT64
@@ -44,9 +45,9 @@ class Declaracion(Instruccion):
         # asegurandonos de que sea el mismo tipo de dato para crear la variable
         if (val.tipo != _tipo):
             # error, diferentes tipos de datos
-            print("error::: " + self.id)
-            pass;
-        scope.crearVariable(self.id, val.valor, val.tipo, self.mut, None, None, None, self.linea, self.columna);
+            _error = _Error(f'Tipos incompatibles. Se esperaba un tipo de dato {_tipo.name} y se encontró {val.tipo}', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
+        scope.crearVariable(self.id, val.valor, 'Variable', val.tipo, self.mut, None, None, None, self.linea, self.columna, console);
     
     def valorDefault(_tipo:TipoDato):
         if (_tipo == TipoDato.INT64):

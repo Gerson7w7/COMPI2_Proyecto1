@@ -6,8 +6,7 @@ import {
 } from "react-router-dom";
 import Inicio from "./components/Inicio";
 import Errores from "./components/Errores";
-//import ASTReport from "./components/ASTReport";
-//import SimbolosReport from "./components/SimbolosReport";
+import SimbolosReport from "./components/Simbolos";
 
 function App() {
   return (
@@ -15,12 +14,9 @@ function App() {
       <Routes>
         <Route path='/' element={<Inicio />} />
         <Route path='/errores' element={<Errores />} />
-        {/*<Route path='/AST' element={<ASTReport />} />
         <Route path='/simbolos' element={<SimbolosReport />} />
-        <Route path='*' element={<ErrorPage />} /> */}
       </Routes>
     </Router>
-    
   );
 }
 

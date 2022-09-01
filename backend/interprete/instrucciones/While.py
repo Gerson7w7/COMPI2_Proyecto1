@@ -1,7 +1,8 @@
 from ..extra.Tipos import TipoDato, TipoTransferencia
 from .Instruccion import Instruccion
-from ..extra.Console import Console
+from ..extra.Console import Console, _Error
 from ..extra.Scope import Scope
+from datetime import datetime
 
 class While(Instruccion):
     def __init__(self, condicion, bloque: Instruccion, linea: int, columna: int):
@@ -13,7 +14,10 @@ class While(Instruccion):
         # primero ejecutamos la condición
         valCondicion = self.condicion.ejecutar(console, scope);
         # verificando de que se trate de un boolean
-        if (valCondicion.tipo != TipoDato.BOOLEAN): pass; # error tiene que se bool 
+        if (valCondicion.tipo != TipoDato.BOOLEAN):
+            # error tiene que se bool
+            _error = _Error(f'Se esperaba un bool como condición pero se obtuvo {valCondicion.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         while(valCondicion.valor):
             # ejecutamos las instrucciones dentro del loop
             val = self.bloque.ejecutar(console, scope, 'While');
@@ -23,7 +27,8 @@ class While(Instruccion):
                 if (val.retorno == TipoTransferencia.BREAK):
                     if (val.valor != None):
                         # error no se puede retornar un valor en un while
-                        pass;
+                        _error = _Error(f'No se puede retornar un valor con un break en un while', scope.ambito, self.linea, self.columna, datetime.now());
+                        raise Exception(_error);
                     break;
                 # return
                 elif (val.retorno == TipoTransferencia.RETURN):
@@ -33,4 +38,7 @@ class While(Instruccion):
                     continue;
             # ejecutamos otra vez la condición
             valCondicion = self.condicion.ejecutar(console, scope);
-            if (valCondicion.tipo != TipoDato.BOOLEAN): pass; # error tiene que se bool 
+            if (valCondicion.tipo != TipoDato.BOOLEAN): 
+                # error tiene que se bool 
+                _error = _Error(f'Se esperaba un bool como condición pero se obtuvo {valCondicion.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
+                raise Exception(_error);

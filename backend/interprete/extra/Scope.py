@@ -3,20 +3,19 @@ import copy
 from ..extra.TablaSimbolo import TablaSimbolo
 from .Tipos import TipoDato 
 from .Simbolo import Simbolo
-from .Console import _Error
+from .Console import _Error, Console
 from datetime import datetime
 
 class Scope:
     def __init__(self, padre, ambito:str):
         self.padre = padre;
         self.ambito = ambito;
-        self.simbolos = [];
         self.variables = {};
         self.funciones = {};
         self.structs = {};
     
     # función para crear una variable
-    def crearVariable(self, id: str, valor, tipo: TipoDato, mut:bool, esVector:bool, with_capacity:int, referencia, linea: int, columna: int):
+    def crearVariable(self, id: str, valor, tipoSimbolo:str, tipoDato: TipoDato, mut:bool, esVector:bool, with_capacity:int, referencia, linea: int, columna: int, console:Console):
         scope: Scope = self;
         ambito:str = scope.ambito;
         while(scope != None):
@@ -27,9 +26,10 @@ class Scope:
                 raise Exception(_error);
             scope = scope.padre;
         # procedemos a crear la variable
-        self.variables[id] = Simbolo(valor, id, tipo, mut, esVector, with_capacity, referencia);
+        self.variables[id] = Simbolo(valor, id, tipoDato, mut, esVector, with_capacity, referencia);
         # lo guardamos en la tabla de simbolos
-        self.simbolos.append(TablaSimbolo(id, 'variable', str(tipo), '', linea, columna))
+        _tipoDato = str(tipoDato.name) if (isinstance(tipoDato, TipoDato)) else tipoDato;
+        console.appendSimbolo(TablaSimbolo(id, tipoSimbolo, _tipoDato, ambito, linea, columna));
 
     # función para obtener el valor de una variable
     def getValor(self, id:str, linea:int, columna:int):
@@ -87,7 +87,7 @@ class Scope:
                     # ERROR. Variable no mutable.
                     _error = _Error(f'La variable {id} no es mutable', ambito, linea, columna, datetime.now())
                     raise Exception(_error);
-                valNuevo = self.recorrerLista(valor, copy.deepcopy(val.valor), indices, 0, ambito, linea, columna);
+                valNuevo = self.recorrerLista(valor, val.valor, indices, 0, ambito, linea, columna);
                 scope.variables.update({id: Simbolo(valNuevo, id, val.tipo, True, val.esVector, val.with_capacity, val.referencia)});
                 # si se pasó por referencia cambiamos también la original
                 if (val.referencia != None):
@@ -122,8 +122,6 @@ class Scope:
             scope = scope.padre;
         # procedemos a guardar la funcion
         self.funciones[id] = fn;
-        # lo guardamos en la tabla de simbolos
-        self.simbolos.append(TablaSimbolo(id, 'función', str(tipo_retorno), '', linea, columna));
 
     def getFuncion(self, id:str, linea:int, columna:int):
         scope: Scope = self;
@@ -148,8 +146,6 @@ class Scope:
             scope = scope.padre;
         # procedemos a guardar la funcion
         self.structs[id] = struct;
-        # lo guardamos en la tabla de simbolos
-        self.simbolos.append(TablaSimbolo(id, 'struct', id, '', linea, columna));
 
     def getStruct(self, id:str, linea:int, columna:int):
         scope: Scope = self;

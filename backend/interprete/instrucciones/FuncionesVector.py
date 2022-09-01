@@ -3,9 +3,10 @@ import copy
 from ..extra.Tipos import TipoDato
 from ..extra.Simbolo import Simbolo
 from .Instruccion import Instruccion
-from ..extra.Console import Console
+from ..extra.Console import Console, _Error
 from ..extra.Scope import Scope
 from ..extra.Retorno import RetornoExpresion
+from datetime import datetime
 
 class Push(Instruccion):
     def __init__(self, id, expresion, linea: int, columna: int):
@@ -18,17 +19,20 @@ class Push(Instruccion):
         val = self.expresion.ejecutar(console, scope);
         # obtenemos el vector
         vector:Simbolo = copy.deepcopy(self.id.ejecutar(console, scope));
-        if (vector.esVector != None):
+        if (vector.esVector == None):
             # ERROR. No es un vector
-            pass;
+            _error = _Error(f'La variable {vector.id} no es un vector, no contiene la función push', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         if (not vector.esVector):
             # ERROR. Los arreglos no contiene la función push
-            pass;
+            _error = _Error(f'Los arreglos {vector.id} no contiene la función push', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         if (vector.tipo == None):
             vector.tipo = val.tipo;
         if (val.tipo != vector.tipo):
             # ERROR. Tipos incompatibles
-            pass;
+            _error = _Error(f'Tipos incompatibles. No se puede almacenar una expresión {val.tipo.name} en una variable de tipo {vector.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         vector.valor.append(val.valor);
         # ahora revisaremos si se trata de un vector con un tamaño definido
         if (vector.with_capacity != None):
@@ -49,18 +53,22 @@ class Insert(Instruccion):
         val2 = self.exp2.ejecutar(console, scope);
         # obtenemos el vector
         vector:Simbolo = copy.deepcopy(self.id.ejecutar(console, scope));
-        if (vector.esVector != None):
+        if (vector.esVector == None):
             # ERROR. No es un vector
-            pass;
+            _error = _Error(f'La variable {vector.id} no es un vector, no contiene la función Insert', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         if (not vector.esVector):
             # ERROR. Los arreglos no contiene la función insert
-            pass;
+            _error = _Error(f'Los arreglos {vector.id} no contiene la función insert', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         if (val2.tipo != vector.tipo):
             # ERROR. Tipos incompatibles
-            pass;
+            _error = _Error(f'Tipos incompatibles. No se puede almacenar una expresión {val2.tipo.name} en una variable de tipo {vector.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         if (val1.tipo != TipoDato.INT64):
             # ERROR. No se puede acceder al indice val1.tipo.
-            pass;
+            _error = _Error(f'No se puede acceder al indice {val1.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         vector.valor.insert(val1.valor, val2.valor);
         # ahora revisaremos si se trata de un vector con un tamaño definido
         if (vector.with_capacity != None):
@@ -79,16 +87,18 @@ class Remove(Instruccion):
         val = self.exp.ejecutar(console, scope);
         # obtenemos el vector
         vector:Simbolo = copy.deepcopy(self.id.ejecutar(console, scope));
-        print("remove: " + str(vector.valor))
-        if (vector.esVector != None):
+        if (vector.esVector == None):
             # ERROR. No es un vector
-            pass;
+            _error = _Error(f'La variable {vector.id} no es un vector, no contiene la función remove', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         if (not vector.esVector):
-            # ERROR. Los arreglos no contiene la función push
-            pass;
+            # ERROR. Los arreglos no contiene la función remove
+            _error = _Error(f'Los arreglos {vector.id} no contiene la función remove', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         if (val.tipo != TipoDato.INT64):
             # ERROR. Tipos incompatibles
-            pass;
+            _error = _Error(f'Se esperaba una posición de tipo i64 pero se obtuvo un tipo {val.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         # primero obtenemos el elemento que se va a eliminar
         valorRetorno = vector.valor[val.valor];
         # ahora eliminamos el elemento
@@ -111,15 +121,18 @@ class Contains(Instruccion):
         val = self.exp.ejecutar(console, scope);
         # obtenemos el vector
         vector:Simbolo = copy.deepcopy(self.id.ejecutar(console, scope));
-        if (vector.esVector != None):
+        if (vector.esVector == None):
             # ERROR. No es un vector
-            pass;
+            _error = _Error(f'La variable {vector.id} no es un vector, no contiene la función contains', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         if (not vector.esVector):
-            # ERROR. Los arreglos no contiene la función push
-            pass;
+            # ERROR. Los arreglos no contiene la función contains
+            _error = _Error(f'Los arreglos {vector.id} no contiene la función contains', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         if (val.tipo != vector.tipo):
             # ERROR. Tipos incompatibles
-            pass;
+            _error = _Error(f'Tipos incompatibles. No se puede almacenar una expresión {val.tipo.name} en una variable de tipo {vector.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         # revisamos si existe el elemento en la lista
         if (val.valor in vector.valor):
             return RetornoExpresion(True, TipoDato.BOOLEAN, None);
@@ -133,12 +146,14 @@ class Longitud(Instruccion):
     def ejecutar(self, console: Console, scope: Scope):
         # obtenemos el vector
         vector:Simbolo = copy.deepcopy(self.id.ejecutar(console, scope));
-        if (vector.esVector != None):
+        if (isinstance(vector, RetornoExpresion)):
             # ERROR. No es un vector
-            pass;
-        if (not vector.esVector):
-            # ERROR. Los arreglos no contiene la función push
-            pass;
+            _error = _Error(f'La expresión no es un vector, no contiene la función len', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
+        if (vector.esVector == None):
+            # ERROR. No es un vector
+            _error = _Error(f'La variable {vector.id} no es un vector, no contiene la función len', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         # retornamos la longitud de la lista
         return RetornoExpresion(len(vector.valor), TipoDato.INT64, None);
 
@@ -150,12 +165,14 @@ class Capacity(Instruccion):
     def ejecutar(self, console: Console, scope: Scope):
         # obtenemos el vector
         vector:Simbolo = copy.deepcopy(self.id.ejecutar(console, scope));
-        if (vector.esVector != None):
+        if (vector.esVector == None):
             # ERROR. No es un vector
-            pass;
+            _error = _Error(f'La variable {vector.id} no es un vector, no contiene la función capacity', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         if (not vector.esVector):
-            # ERROR. Los arreglos no contiene la función push
-            pass;
+            # ERROR. Los arreglos no contiene la función capacity
+            _error = _Error(f'Los arreglos {vector.id} no contiene la función capacity', scope.ambito, self.linea, self.columna, datetime.now());
+            raise Exception(_error);
         # retornamos la capacidad de la lista
         if (vector.with_capacity != None):
             return RetornoExpresion(vector.with_capacity, TipoDato.INT64, None);

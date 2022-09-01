@@ -19,11 +19,14 @@ def grammar():
     if request.method == 'POST':
         data = request.json
         print(data['data']);
-        ast: Ast = parser.parse(data['data']);
-        scope: Scope = Scope(None, 'Global');
-        # limpiamos la consola de salida
         console.output = ""; console.errores = [];
-        ast.ejecutar(console, scope);
+        try:
+            ast: Ast = parser.parse(data['data']);
+            scope: Scope = Scope(None, 'Global');
+            # limpiamos la consola de salida
+            ast.ejecutar(console, scope);
+        except Exception as e:
+            console.append(e.args[0]);
         print("soi console: " + console.output);
         return {
             'salida': console.output
@@ -32,6 +35,10 @@ def grammar():
 @app.route('/errores', methods=['GET'])
 def errores():
     return jsonify(res = [e.serializar() for e in console.errores]);
+
+@app.route('/simbolos', methods=['GET'])
+def simbolos():
+    return jsonify(res = [s.serializar() for s in console.simbolos]);
 
 if __name__=='__main__':
     app.run(debug = True, port = 5000)

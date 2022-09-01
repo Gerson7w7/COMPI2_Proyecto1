@@ -151,5 +151,9 @@ def t_comentario(t):
     r'//.*';
     pass;
 
+def t_multicomentarios(t):
+    r'[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]';
+    pass;
+
 # construímos el lexer (analizador léxico)
 lex.lex();
