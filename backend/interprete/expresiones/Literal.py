@@ -16,6 +16,7 @@ class Literal(Expresion):
         elif (self.tipo == TipoDato.FLOAT64):
             return RetornoExpresion(float(self.valor), TipoDato.FLOAT64, None);
         elif (self.tipo == TipoDato.BOOLEAN):
+            print("BOOOL:: " + str(self.valor) +" -> " + str(bool(self.valor)))
             return RetornoExpresion(self.valor, TipoDato.BOOLEAN, None);
         elif (self.tipo == TipoDato.CHAR):
             return RetornoExpresion(self.valor, TipoDato.CHAR, None);

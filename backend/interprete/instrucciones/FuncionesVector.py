@@ -18,7 +18,7 @@ class Push(Instruccion):
         # ejecutando la expresión
         val = self.expresion.ejecutar(console, scope);
         # obtenemos el vector
-        vector:Simbolo = copy.deepcopy(self.id.ejecutar(console, scope));
+        vector:Simbolo = self.id.ejecutar(console, scope);
         if (vector.esVector == None):
             # ERROR. No es un vector
             _error = _Error(f'La variable {vector.id} no es un vector, no contiene la función push', scope.ambito, self.linea, self.columna, datetime.now());
@@ -36,7 +36,7 @@ class Push(Instruccion):
         vector.valor.append(val.valor);
         # ahora revisaremos si se trata de un vector con un tamaño definido
         if (vector.with_capacity != None):
-            if (vector.with_capacity < len(vector.valor)):
+            if (vector.with_capacity < len(vector.valor) + 1):
                 vector.with_capacity = vector.with_capacity * 2;
         scope.setValor(self.id.id, vector, self.linea, self.columna);
 
@@ -52,7 +52,7 @@ class Insert(Instruccion):
         val1 = self.exp1.ejecutar(console, scope);
         val2 = self.exp2.ejecutar(console, scope);
         # obtenemos el vector
-        vector:Simbolo = copy.deepcopy(self.id.ejecutar(console, scope));
+        vector:Simbolo = self.id.ejecutar(console, scope);
         if (vector.esVector == None):
             # ERROR. No es un vector
             _error = _Error(f'La variable {vector.id} no es un vector, no contiene la función Insert', scope.ambito, self.linea, self.columna, datetime.now());
@@ -86,7 +86,7 @@ class Remove(Instruccion):
         # indice del elemento a eliminar
         val = self.exp.ejecutar(console, scope);
         # obtenemos el vector
-        vector:Simbolo = copy.deepcopy(self.id.ejecutar(console, scope));
+        vector:Simbolo = self.id.ejecutar(console, scope);
         if (vector.esVector == None):
             # ERROR. No es un vector
             _error = _Error(f'La variable {vector.id} no es un vector, no contiene la función remove', scope.ambito, self.linea, self.columna, datetime.now());
@@ -120,7 +120,7 @@ class Contains(Instruccion):
         # expresion del elemento a buscar
         val = self.exp.ejecutar(console, scope);
         # obtenemos el vector
-        vector:Simbolo = copy.deepcopy(self.id.ejecutar(console, scope));
+        vector:Simbolo = self.id.ejecutar(console, scope);
         if (vector.esVector == None):
             # ERROR. No es un vector
             _error = _Error(f'La variable {vector.id} no es un vector, no contiene la función contains', scope.ambito, self.linea, self.columna, datetime.now());
@@ -145,7 +145,7 @@ class Longitud(Instruccion):
 
     def ejecutar(self, console: Console, scope: Scope):
         # obtenemos el vector
-        vector:Simbolo = copy.deepcopy(self.id.ejecutar(console, scope));
+        vector:Simbolo = self.id.ejecutar(console, scope);
         if (isinstance(vector, RetornoExpresion)):
             # ERROR. No es un vector
             _error = _Error(f'La expresión no es un vector, no contiene la función len', scope.ambito, self.linea, self.columna, datetime.now());
@@ -164,7 +164,7 @@ class Capacity(Instruccion):
 
     def ejecutar(self, console: Console, scope: Scope):
         # obtenemos el vector
-        vector:Simbolo = copy.deepcopy(self.id.ejecutar(console, scope));
+        vector:Simbolo = self.id.ejecutar(console, scope);
         if (vector.esVector == None):
             # ERROR. No es un vector
             _error = _Error(f'La variable {vector.id} no es un vector, no contiene la función capacity', scope.ambito, self.linea, self.columna, datetime.now());

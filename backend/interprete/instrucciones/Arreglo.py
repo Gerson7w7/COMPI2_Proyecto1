@@ -1,8 +1,10 @@
+from ..extra.Simbolo import Simbolo
 from ..instrucciones.Instruccion import Instruccion
 from ..expresiones.Expresion import Expresion
 from ..extra.Scope import Scope
 from ..extra.Console import Console, _Error
 from ..extra.Tipos import TipoDato
+from ..extra.Retorno import RetornoExpresion
 from datetime import datetime
 
 class Dimension:
@@ -30,44 +32,49 @@ class Arreglo(Instruccion):
     def ejecutar(self, console: Console, scope: Scope):
         # primero miramos de que tipo de dato será el arreglo
         # y las dimensiones que tendrá}
-        _tipo: TipoDato = None;
-        _dimensiones:list = [];
-        if (self.dimension != None):
-            if (self.dimension.tipo == 'i64' or self.dimension.tipo == 'usize'):
-                _tipo = TipoDato.INT64
-            elif (self.dimension.tipo == 'f64'):
-                _tipo = TipoDato.FLOAT64
-            elif (self.dimension.tipo == 'bool'):
-                _tipo = TipoDato.BOOLEAN
-            elif (self.dimension.tipo == 'char'):
-                _tipo = TipoDato.CHAR
-            elif (self.dimension.tipo == 'String'):
-                _tipo = TipoDato.STRING
-            elif (self.dimension.tipo == 'str'):
-                _tipo = TipoDato.STR
+        if (isinstance(self.valor, Simbolo)):
+            scope.crearVariable(self.id, self.valor.valor, 'Arreglo', self.valor.tipo, self.valor.mut, self.valor.esVector, self.valor.with_capacity, None, self.linea, self.columna, console);
+        else:
+            _tipo: TipoDato = None;
+            _dimensiones:list = [];
+            if (self.dimension != None):
+                if (self.dimension.tipo == 'i64' or self.dimension.tipo == 'usize'):
+                    _tipo = TipoDato.INT64
+                elif (self.dimension.tipo == 'f64'):
+                    _tipo = TipoDato.FLOAT64
+                elif (self.dimension.tipo == 'bool'):
+                    _tipo = TipoDato.BOOLEAN
+                elif (self.dimension.tipo == 'char'):
+                    _tipo = TipoDato.CHAR
+                elif (self.dimension.tipo == 'String'):
+                    _tipo = TipoDato.STRING
+                elif (self.dimension.tipo == 'str'):
+                    _tipo = TipoDato.STR
+                else:
+                    _tipo = self.dimension.tipo;
 
-            for dim in self.dimension.dimensiones:
-                _dimensiones.append(dim);
-        # with_capacity
-        val_with_capacity = None;
-        if (self.with_capacity != None):
-            val_with_capacity = self.with_capacity.ejecutar(console, scope);
-            if (val_with_capacity.tipo != TipoDato.INT64):
-                #ERROR. Se esperaba un int
-                _error = _Error(f'Se esperaba un i64 para la capacidad del vector, no un {val_with_capacity.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
-                raise Exception(_error);
-            val_with_capacity = val_with_capacity.valor;
+                for dim in self.dimension.dimensiones:
+                    _dimensiones.append(dim);
+            # with_capacity
+            val_with_capacity = None;
+            if (self.with_capacity != None):
+                val_with_capacity = self.with_capacity.ejecutar(console, scope);
+                if (val_with_capacity.tipo != TipoDato.INT64):
+                    #ERROR. Se esperaba un int
+                    _error = _Error(f'Se esperaba un i64 para la capacidad del vector, no un {val_with_capacity.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
+                    raise Exception(_error);
+                val_with_capacity = val_with_capacity.valor;
 
-        # inicializamos el arreglo resultante que quedará
-        listaResultante:list = [];
-        # indice del arreglo con las dimensiones
-        iAux:int = -1 if (len(_dimensiones) == 0) else len(_dimensiones) - 1;
-        listaResultante = self.nuevaDimension(self.valor, console, scope, _tipo, _dimensiones, iAux);
-        # esto nos ayudará para saber que tipo de dato es en la asignación
-        if (self.tipo == None and self.dimension != None):
-            self.tipo = _tipo;
-        tipoSimbolo:str = 'Vector' if (self.esVector) else 'Arreglo';
-        scope.crearVariable(self.id, listaResultante, tipoSimbolo, self.tipo, self.mut, self.esVector, val_with_capacity, None, self.linea, self.columna, console);
+            # inicializamos el arreglo resultante que quedará
+            listaResultante:list = [];
+            # indice del arreglo con las dimensiones
+            iAux:int = -1 if (len(_dimensiones) == 0) else len(_dimensiones) - 1;
+            listaResultante = self.nuevaDimension(self.valor, console, scope, _tipo, _dimensiones, iAux);
+            # esto nos ayudará para saber que tipo de dato es en la asignación
+            if (self.tipo == None and self.dimension != None):
+                self.tipo = _tipo;
+            tipoSimbolo:str = 'Vector' if (self.esVector) else 'Arreglo';
+            scope.crearVariable(self.id, listaResultante, tipoSimbolo, self.tipo, self.mut, self.esVector, val_with_capacity, None, self.linea, self.columna, console);
 
     def nuevaDimension(self, valor, console: Console, scope: Scope, _tipo:TipoDato, dimensionesAux:list, iAux:int):
         # verificamos que se trate de una lista, sino es una expresion

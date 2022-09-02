@@ -2,7 +2,6 @@
 from interprete.ply.yacc import yacc
 from interprete.analizador import lexer
 
-import re
 from ..expresiones.Aritmetica import Aritmetica
 from ..extra.Tipos import TipoAritmetica, TipoDato, TipoLogico, TipoNativo, TipoRelacional, TipoTransferencia
 from ..extra.Ast import Ast
@@ -459,7 +458,8 @@ def p_expresion_terminales(p):
         p[0] = Literal(p[1], TipoDato.FLOAT64, p.lineno(1), p.lexpos(1));
     elif (p[1] == 'true' or p[1] == 'false'):
         # bools
-        p[0] = Literal(p[1], TipoDato.BOOLEAN, p.lineno(1), p.lexpos(1));
+        boolean = True if (p[1] == 'true') else False;
+        p[0] = Literal(boolean, TipoDato.BOOLEAN, p.lineno(1), p.lexpos(1));
     else:
         # chars
         p[0] = Literal(p[1], TipoDato.CHAR, p.lineno(1), p.lexpos(1));

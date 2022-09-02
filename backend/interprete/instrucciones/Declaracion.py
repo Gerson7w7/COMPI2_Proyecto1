@@ -1,3 +1,4 @@
+from ..extra.Simbolo import Simbolo
 from ..extra.Tipos import TipoDato
 from .Instruccion import Instruccion
 from ..extra.Console import Console, _Error
@@ -29,9 +30,14 @@ class Declaracion(Instruccion):
                 _tipo = TipoDato.STRING
             elif (self.tipo == 'str'):
                 _tipo = TipoDato.STR
+            else: 
+                _tipo = self.tipo;
 
+        # expresiones ya ejecutadas
+        if (isinstance(self.valor, RetornoExpresion) or isinstance(self.valor, Simbolo)):
+            val = self.valor;
         # variables inicializadas
-        if (self.valor != None):
+        elif (self.valor != None):
             # obteniendo el valor de la expresion
             val = self.valor.ejecutar(console, scope);
         # variables no inicializadas
@@ -39,14 +45,11 @@ class Declaracion(Instruccion):
             val = self.valorDefault(_tipo);
 
         _tipo = val.tipo if (_tipo == None) else _tipo;
-        print("============= " + str(self.id) + "============")
-        print("_tipo:" + str(_tipo));
-        print("_tipo2:" + str(val.tipo));
         # asegurandonos de que sea el mismo tipo de dato para crear la variable
         if (val.tipo != _tipo):
             # error, diferentes tipos de datos
             _error = _Error(f'Tipos incompatibles. Se esperaba un tipo de dato {_tipo.name} y se encontró {val.tipo}', scope.ambito, self.linea, self.columna, datetime.now());
-            raise Exception(_error);
+            raise Exception(_error);  
         scope.crearVariable(self.id, val.valor, 'Variable', val.tipo, self.mut, None, None, None, self.linea, self.columna, console);
     
     def valorDefault(_tipo:TipoDato):
@@ -70,5 +73,8 @@ class Asignacion(Instruccion):
         self.expresion = expresion;
 
     def ejecutar(self, console: Console, scope: Scope):
-        val = self.expresion.ejecutar(console, scope);
+        if (isinstance(self.expresion, RetornoExpresion) or isinstance(self.expresion, Simbolo)):
+            val = self.expresion;
+        else:
+            val = self.expresion.ejecutar(console, scope);
         scope.setValor(self.id, val, self.linea, self.columna);

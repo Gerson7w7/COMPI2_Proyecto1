@@ -69,3 +69,7 @@ class Funcion(Instruccion):
             return TipoDato.STR;
         elif (tipo == 'String'):
             return TipoDato.STRING;
+        elif (tipo == 'bool'):
+            return TipoDato.BOOLEAN;
+        else:
+            return tipo;

@@ -14,7 +14,7 @@ class Casteo(Expresion):
     def ejecutar(self, console: Console, scope: Scope):
         # recuperamos la expresion
         val = self.expresion.ejecutar(console, scope);
-        if (self.tipo == 'i64'):
+        if (self.tipo == 'i64' or self.tipo == 'usize'):
             return RetornoExpresion(int(val.valor), TipoDato.INT64, None);
         elif (self.tipo == 'f64'):
             try:

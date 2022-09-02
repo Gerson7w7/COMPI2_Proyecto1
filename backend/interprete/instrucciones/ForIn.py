@@ -1,3 +1,4 @@
+from ..extra.Simbolo import Simbolo
 from ..instrucciones.Arreglo import Arreglo
 from ..extra.Tipos import TipoDato, TipoTransferencia
 from .Instruccion import Instruccion
@@ -80,17 +81,26 @@ class ForIn(Instruccion):
                             continue;
         else:
             # acceso a vector o arreglo
-            val = self.iterable.ejecutar(console, newScope);
+            val:Simbolo = self.iterable.ejecutar(console, newScope);
             if (not isinstance(val.valor, list)):
                 # ERROR. La expresión no es iterable
                 _error = _Error(f'La expresión {val.valor} no es iterable', scope.ambito, self.linea, self.columna, datetime.now());
                 raise Exception(_error);
             # ejecutamos la declaración 
-            declaracion = Declaracion(True, self.id, val.tipo, Literal(val.valor[0], val.tipo, self.linea, self.columna), self.linea, self.columna);
+            valorInicial = val.valor[0];
+            if (isinstance(valorInicial, Scope)):
+                valorInicial = Simbolo(valorInicial, 'Struct', val.tipo, val.mut, val.esVector, val.with_capacity, val.referencia);
+            else:
+                valorInicial = Literal(val.valor[0], val.tipo, self.linea, self.columna);
+            declaracion = Declaracion(True, self.id, val.tipo, valorInicial, self.linea, self.columna);
             declaracion.ejecutar(console, newScope);
             for i in val.valor:
                     # actualizamos la variable de control
-                    asignacion = Asignacion(self.id, Literal(i, val.tipo, self.linea, self.columna), self.linea, self.columna);
+                    if (isinstance(i, Scope)):
+                        valorActual = Simbolo(i, 'Struct', val.tipo, val.mut, val.esVector, val.with_capacity, val.referencia);
+                    else:
+                        valorActual = Literal(i, val.tipo, self.linea, self.columna);
+                    asignacion = Asignacion(self.id, valorActual, self.linea, self.columna);
                     asignacion.ejecutar(console, newScope);
                     # ejecutamos el bloque de código
                     valBloque = self.bloque.ejecutar(console, newScope, 'ForIn');

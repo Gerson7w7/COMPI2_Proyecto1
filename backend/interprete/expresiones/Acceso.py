@@ -43,7 +43,7 @@ class AccesoArreglo(Expresion):
             val = self.obtenerValor(listaSimbolo.valor, _indices, 0);
             if (isinstance(val, list)):
                 return Simbolo(val, '', listaSimbolo.tipo, listaSimbolo.mut, listaSimbolo.esVector, listaSimbolo.with_capacity, None);
-            return RetornoExpresion(val, listaSimbolo.tipo, None);
+            return Simbolo(val, '', listaSimbolo.tipo, listaSimbolo.mut, listaSimbolo.esVector, listaSimbolo.with_capacity, listaSimbolo.referencia);
         except:
             _error = _Error(f'Indice fuera de rango', scope.ambito, self.linea, self.columna, datetime.now())
             raise Exception(_error);

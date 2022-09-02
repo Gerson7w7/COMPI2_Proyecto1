@@ -54,7 +54,7 @@ class InstanciaStruct(Instruccion):
             # primero traemos el atributo o declaracion desde el struct
             atributo = struct.obtenerAtributo(exp.id, scope);
             # ahora ejecutamos la declaración para que se cree la variable
-            atributo.valor = exp.valor;
+            atributo.valor = exp.valor.ejecutar(console, scope);
             atributo.ejecutar(console, newScope);
         # creando la variable de tipo struct
         scope.crearVariable(self.id, newScope, 'Struct', self.instancia.idInstancia, self.mut, None, None, None, self.linea, self.columna, console);

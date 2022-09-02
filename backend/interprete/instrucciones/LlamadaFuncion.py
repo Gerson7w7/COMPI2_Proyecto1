@@ -2,6 +2,7 @@ from .Funcion import Funcion
 from .Instruccion import Instruccion
 from ..extra.Console import Console, _Error
 from ..extra.Scope import Scope
+from ..extra.Retorno import RetornoExpresion
 from datetime import datetime
 
 class LlamadaFuncion(Instruccion):
@@ -11,7 +12,6 @@ class LlamadaFuncion(Instruccion):
         self.argumentos = argumentos;
     
     def ejecutar(self, console: Console, scope: Scope):
-        print("ENTRO AKI")
         newScope = Scope(scope.getGlobal(), 'Funcion');
         # obtenemos la función 
         funcion:Funcion = scope.getFuncion(self.id, self.linea, self.columna);
@@ -34,11 +34,13 @@ class LlamadaFuncion(Instruccion):
                 referencia = Referencia(scope, idReferencia, val);
                 newScope.crearVariable(idParam, val.valor, 'Dirección de memoria', val.tipo, True, val.esVector, val.with_capacity, referencia, self.linea, self.columna, console);
             else:
-                newScope.crearVariable(idParam, val.valor, 'Variable', val.tipo, True, None, None, val.referencia, self.linea, self.columna, console);
+                if (isinstance(val, RetornoExpresion)):
+                    newScope.crearVariable(idParam, val.valor, 'Variable', val.tipo, True, None, None, None, self.linea, self.columna, console);
+                else:
+                    newScope.crearVariable(idParam, val.valor, 'Variable', val.tipo, True, None, None, val.referencia, self.linea, self.columna, console);
         # ejecutando las instrucciones de la función 
         valBloque = funcion.bloque.ejecutar(console, newScope, 'Funcion');
         # verificando el retorno de la función
-        print("SALGO AKI")
         if (valBloque != None):
             funcion.tipoRetorno(valBloque.tipo, scope);
         else:

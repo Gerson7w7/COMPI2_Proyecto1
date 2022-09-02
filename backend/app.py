@@ -20,13 +20,13 @@ def grammar():
         data = request.json
         print(data['data']);
         console.output = ""; console.errores = [];
-        try:
-            ast: Ast = parser.parse(data['data']);
-            scope: Scope = Scope(None, 'Global');
-            # limpiamos la consola de salida
-            ast.ejecutar(console, scope);
-        except Exception as e:
-            console.append(e.args[0]);
+        #try:
+        ast: Ast = parser.parse(data['data']);
+        scope: Scope = Scope(None, 'Global');
+        # limpiamos la consola de salida
+        ast.ejecutar(console, scope);
+        # except Exception as e:
+        #     console.append(e.args[0]);
         print("soi console: " + console.output);
         return {
             'salida': console.output
