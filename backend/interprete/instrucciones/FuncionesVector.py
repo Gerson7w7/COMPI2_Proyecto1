@@ -1,5 +1,6 @@
 import copy
 
+from .Arreglo import Dimension
 from ..extra.Tipos import TipoDato
 from ..extra.Simbolo import Simbolo
 from .Instruccion import Instruccion
@@ -30,15 +31,33 @@ class Push(Instruccion):
         if (vector.tipo == None):
             vector.tipo = val.tipo;
         if (val.tipo != vector.tipo):
-            # ERROR. Tipos incompatibles
-            _error = _Error(f'Tipos incompatibles. No se puede almacenar una expresión {val.tipo.name} en una variable de tipo {vector.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
-            raise Exception(_error);
+            if (isinstance(vector.tipo, Dimension) and val.tipo != self.devolverTipo(vector.tipo.tipo)):
+                # ERROR. Tipos incompatibles
+                print(str(val.tipo) +"!="+ str(vector.tipo))
+                _error = _Error(f'Tipos incompatibles. No se puede almacenar una expresión {val.tipo.name} en una variable de tipo {vector.tipo.name}', scope.ambito, self.linea, self.columna, datetime.now());
+                raise Exception(_error);
         vector.valor.append(val.valor);
         # ahora revisaremos si se trata de un vector con un tamaño definido
         if (vector.with_capacity != None):
             if (vector.with_capacity < len(vector.valor) + 1):
                 vector.with_capacity = vector.with_capacity * 2;
         scope.setValor(self.id.id, vector, self.linea, self.columna);
+
+    def devolverTipo(self, tipo:str):
+        if (tipo == 'i64' or tipo == 'usize'):
+            return TipoDato.INT64
+        elif (tipo == 'f64'):
+            return TipoDato.FLOAT64
+        elif (tipo == 'bool'):
+            return TipoDato.BOOLEAN
+        elif (tipo == 'char'):
+            return TipoDato.CHAR
+        elif (tipo == 'String'):
+            return TipoDato.STRING
+        elif (tipo == 'str'):
+            return TipoDato.STR
+        else:
+            return tipo;
 
 class Insert(Instruccion):
     def __init__(self, id:str, exp1, exp2, linea: int, columna: int):
@@ -153,6 +172,8 @@ class Longitud(Instruccion):
         if (vector.esVector == None):
             # ERROR. No es un vector
             _error = _Error(f'La variable {vector.id} no es un vector, no contiene la función len', scope.ambito, self.linea, self.columna, datetime.now());
+            print(_error.descripcion)
+            print("vall:: " + str(vector.valor))
             raise Exception(_error);
         # retornamos la longitud de la lista
         return RetornoExpresion(len(vector.valor), TipoDato.INT64, None);

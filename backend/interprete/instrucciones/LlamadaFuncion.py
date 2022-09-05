@@ -1,3 +1,4 @@
+from ..extra.Simbolo import Simbolo
 from .Funcion import Funcion
 from .Instruccion import Instruccion
 from ..extra.Console import Console, _Error
@@ -36,6 +37,8 @@ class LlamadaFuncion(Instruccion):
             else:
                 if (isinstance(val, RetornoExpresion)):
                     newScope.crearVariable(idParam, val.valor, 'Variable', val.tipo, True, None, None, None, self.linea, self.columna, console);
+                elif (isinstance(val, Simbolo)):
+                    newScope.crearVariable(idParam, val.valor, 'Variable', val.tipo, True, val.esVector, val.with_capacity, val.referencia, self.linea, self.columna, console);
                 else:
                     newScope.crearVariable(idParam, val.valor, 'Variable', val.tipo, True, None, None, val.referencia, self.linea, self.columna, console);
         # ejecutando las instrucciones de la función 

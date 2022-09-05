@@ -4,7 +4,6 @@ from ..expresiones.Expresion import Expresion
 from ..extra.Scope import Scope
 from ..extra.Console import Console, _Error
 from ..extra.Tipos import TipoDato
-from ..extra.Retorno import RetornoExpresion
 from datetime import datetime
 
 class Dimension:

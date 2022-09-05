@@ -274,7 +274,7 @@ def p_type_arreglo(p):
 
 def p_type_vector(p):
     """
-    type_vector : VEC_OBJ MENOR type MAYOR
+    type_vector : VEC_OBJ MENOR declaracion_tipo MAYOR
     """
     p[0] = Dimension(p[3], [], True);
 
@@ -748,8 +748,8 @@ def p_empty(p):
     p[0] = None;
 
 # error sintáctico
-def p_error(p):
-    raise Exception(f'Error de sintaxis {p.type}, linea: {p.lineno}, columna: {p.lexpos}')
+# def p_error(p):
+#     raise Exception(f'Error de sintaxis {p.type}, linea: {p.lineno}, columna: {p.lexpos}')
 
 # construyendo el parser (analizador sintáctico)
 parser = yacc()
