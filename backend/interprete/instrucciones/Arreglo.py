@@ -1,7 +1,6 @@
 from ..extra.Simbolo import Simbolo
 from ..instrucciones.Instruccion import Instruccion
 from ..expresiones.Expresion import Expresion
-from ..extra.Scope import Scope
 from ..extra.Console import Console, _Error
 from ..extra.Tipos import TipoDato
 from datetime import datetime
@@ -28,7 +27,7 @@ class Arreglo(Instruccion):
         self.with_capacity = with_capacity;
         self.tipo = None;
 
-    def ejecutar(self, console: Console, scope: Scope):
+    def ejecutar(self, console: Console, scope):
         # primero miramos de que tipo de dato será el arreglo
         # y las dimensiones que tendrá}
         if (isinstance(self.valor, Simbolo)):
@@ -75,7 +74,7 @@ class Arreglo(Instruccion):
             tipoSimbolo:str = 'Vector' if (self.esVector) else 'Arreglo';
             scope.crearVariable(self.id, listaResultante, tipoSimbolo, self.tipo, self.mut, self.esVector, val_with_capacity, None, self.linea, self.columna, console);
 
-    def nuevaDimension(self, valor, console: Console, scope: Scope, _tipo:TipoDato, dimensionesAux:list, iAux:int):
+    def nuevaDimension(self, valor, console: Console, scope, _tipo:TipoDato, dimensionesAux:list, iAux:int):
         # verificamos que se trate de una lista, sino es una expresion
         listaAux:list = [];
         # contador para verificar cuantos elementos contiene el arreglo
@@ -131,7 +130,7 @@ class AsignacionArreglo(Instruccion):
         self.indices = indices;
         self.expresion = expresion if(isinstance(expresion, Expresion) or isinstance(expresion, Dimension)) else list(expresion);
 
-    def ejecutar(self, console: Console, scope: Scope):
+    def ejecutar(self, console: Console, scope):
         # obtenemos el valor de la expresion
         if (isinstance(self.expresion, Expresion)):
             val = self.expresion.ejecutar(console, scope);

@@ -1,5 +1,4 @@
 # clase para manejar los entornos, ambitos, env o scopes
-import copy
 from ..extra.TablaSimbolo import TablaSimbolo
 from .Tipos import TipoDato 
 from .Simbolo import Simbolo

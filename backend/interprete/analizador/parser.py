@@ -748,8 +748,8 @@ def p_empty(p):
     p[0] = None;
 
 # error sintáctico
-# def p_error(p):
-#     raise Exception(f'Error de sintaxis {p.type}, linea: {p.lineno}, columna: {p.lexpos}')
+def p_error(p):
+    raise Exception(f'Error de sintaxis {p.type}, linea: {p.lineno}, columna: {p.lexpos}');
 
 # construyendo el parser (analizador sintáctico)
 parser = yacc()

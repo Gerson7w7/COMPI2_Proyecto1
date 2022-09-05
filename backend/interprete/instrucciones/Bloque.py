@@ -13,16 +13,14 @@ class Bloque(Instruccion):
         # creando un nuevo entorno
         newScope = Scope(scope, ambito);
         for instruccion in self.instrucciones:
-            #try:
+            try:
                 val = instruccion.ejecutar(console, newScope);
                 if (val != None):
                     if (ambito == 'Main'):
                         _error = _Error(f'No se esperaba la sentencia {val.retorno.name}', scope.ambito, self.linea, self.columna, datetime.now());
                         raise Exception(_error);
                     return val;
-            # except Exception as e:
-            #     print("ERR::  " + str(e))
-            #     exit()
-            #     console.append(f'ERROR: {e.args[0].descripcion}. En la línea {e.args[0].linea}, columna {e.args[0].columna}\n');
-            #     # agregamos a lista de errores
-            #     console.error(e.args[0]);
+            except Exception as e:
+                console.append(f'ERROR: {e.args[0].descripcion}. En la línea {e.args[0].linea}, columna {e.args[0].columna}\n');
+                # agregamos a lista de errores
+                console.error(e.args[0]);
